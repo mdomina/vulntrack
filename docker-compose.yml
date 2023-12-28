@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  vulntrack_backend:
+    image: vulntrack/backend:1.0
+    container_name: vulntrack_backend
+    ports:
+      - "8080:80"
+    environment:
+      - MONGODB_HOST=mongo-pwndoc
+      - MONGODB_PORT=27017
+    networks:
+      - pwndoc_backend
+
+networks:
+  pwndoc_backend:
+    driver: bridge

@@ -1,0 +1,33 @@
+2023-06-29 15:49:49,343 - ERROR - [-] estrazione data: Missing optional dependency 'openpyxl'.  Use pip or conda to install openpyxl.
+2023-06-29 15:52:19,896 - ERROR - [-] estrazione data: name 'data' is not defined
+2023-06-29 15:57:37,639 - ERROR - [-] estrazione data: name 'data' is not defined
+2023-06-30 19:15:55,775 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-06-30 19:16:27,701 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-04 10:42:47,402 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-12 12:02:27,024 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-12 13:05:18,148 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-12 16:07:05,633 - ERROR - [-] estrazione data: 
+2023-07-12 16:10:56,845 - ERROR - [-] estrazione data: 
+2023-07-12 16:12:42,257 - ERROR - [-] estrazione data: 
+2023-07-12 16:14:24,334 - ERROR - [-] estrazione data: 
+2023-07-14 13:05:57,203 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:06:21,104 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:07:27,686 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:07:52,731 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:09:58,678 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:11:57,845 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:16:34,281 - ERROR - [-] estrazione data: 'Timestamp' object has no attribute 'notna'
+2023-07-14 13:19:44,268 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:25:12,269 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:27:19,300 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:28:41,516 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:29:13,867 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:30:54,448 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:31:38,029 - ERROR - [-] estrazione data: Object of type datetime is not JSON serializable
+2023-07-14 13:44:20,866 - ERROR - [-] estrazione data: 'str' object has no attribute 'strftime'
+2023-07-14 13:45:51,516 - ERROR - [-] estrazione data: 'str' object has no attribute 'strftime'
+2023-09-29 10:33:41,870 - ERROR - [-] estrazione data: 'gravità'
+2023-09-29 10:33:46,782 - ERROR - [-] estrazione data: 'gravità'
+2023-09-29 12:19:05,392 - ERROR - [-] estrazione data: 'gravità'
+2023-09-29 12:19:35,184 - ERROR - [-] estrazione data: 'gravità'
+2023-09-29 12:24:21,532 - ERROR - [-] estrazione data: 'gravità'

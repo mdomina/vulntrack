@@ -1,0 +1,1 @@
+Cartella che contiene i log
