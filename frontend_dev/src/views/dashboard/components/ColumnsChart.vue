@@ -83,8 +83,8 @@ export default {
   methods: {
     formatData() {
       let dataFromMongoDB = this.data; // Inserisci qui i tuoi dati
-
-      let projects = dataFromMongoDB.map(item => ({ date: item.data[0]['ultimo aggiornamento'], name: item.nome }));
+      
+      let projects = dataFromMongoDB.map(item => ({ date: item.data[0]['ultimo aggiornamento'], name: item.nome, cliente: item.cliente }));
 
       let dateCounts = {}; // Un oggetto per tenere traccia delle date e dei conteggi
 
@@ -95,7 +95,7 @@ export default {
           dateCounts[project.date] = dateCounts[project.date].concat(dataFromMongoDB.find(item => item.nome === project.name && item.cliente === project.cliente).data);
         }
       });
-
+      
       let severities = ['Critica', 'Alta', 'Media', 'Bassa'];
 
       let chartData = severities.map(severity => {
