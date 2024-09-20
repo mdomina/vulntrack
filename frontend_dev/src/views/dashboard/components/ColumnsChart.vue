@@ -90,9 +90,9 @@ export default {
 
       projects.forEach(project => {
         if (!dateCounts[project.date]) {
-          dateCounts[project.date] = dataFromMongoDB.find(item => item.nome === project.name).data;
+          dateCounts[project.date] = dataFromMongoDB.find(item => item.nome === project.name && item.cliente === project.cliente).data;
         } else {
-          dateCounts[project.date] = dateCounts[project.date].concat(dataFromMongoDB.find(item => item.nome === project.name).data);
+          dateCounts[project.date] = dateCounts[project.date].concat(dataFromMongoDB.find(item => item.nome === project.name && item.cliente === project.cliente).data);
         }
       });
 
