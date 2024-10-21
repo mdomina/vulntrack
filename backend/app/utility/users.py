@@ -29,8 +29,10 @@ def get_user(username: str):
         return None
     
 
-# Definiamo una funzione asincrona per ottenere l'utente corrente
+
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    """Recupera i dati utente dal JWT"""
+    
     # Creiamo un'eccezione per i casi in cui non possiamo validare le credenziali dell'utente
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
