@@ -1,6 +1,5 @@
-from typing import Annotated
 from app.database.database import MyDB
-from fastapi import APIRouter, Depends, File, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.model.model import InputNomeApp, User
 from app.utility.format_rechecks import filter_rechecks
