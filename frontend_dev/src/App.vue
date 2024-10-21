@@ -6,15 +6,12 @@
 </template>
 
 <script>
-// Importa le variabili di configurazione
-import { API_URL, IMAGES_PATH } from './vue_config';
 
 export default {
   name: 'App',
 
   data() {
     return {
-      apiUrl: API_URL,
       };
     },
 

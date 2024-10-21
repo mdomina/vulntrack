@@ -2,12 +2,12 @@ from typing import Annotated
 from app.database.database import MyDB
 from fastapi import APIRouter, Depends, File, HTTPException, status
 
-from backend.app.model.model import InputNomeApp, User
-from backend.app.utility.format_rechecks import filter_rechecks
-from backend.app.utility.mapping_vulnerability import MappingVulnerability
-from backend.app.utility.users import get_current_user
+from app.model.model import InputNomeApp, User
+from app.utility.format_rechecks import filter_rechecks
+from app.utility.mapping_vulnerability import MappingVulnerability
+from app.utility.users import get_current_user
 
-router = APIRouter(prefix="/recheck", dependencies=Depends(get_current_user))
+router = APIRouter(prefix="/recheck", dependencies=[Depends(get_current_user)])
 mydb = MyDB()
 
 @router.get("/list")

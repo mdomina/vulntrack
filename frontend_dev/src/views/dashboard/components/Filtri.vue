@@ -55,13 +55,15 @@ export default {
   }),
   methods: {
     getNameApps() {
-      axios.get('/remediadion/names/app').then(res => {
+      const urlBackend = process.env.VUE_APP_VAPT_NAMES_APP;
+      axios.get(urlBackend).then(res => {
         this.items = res.data
       })
     },
     filteredData() {
       let data = { nome: this.nomeApp, type: this.typeApp }
-      axios.post('/remediadions/list/filtered', data).then(res => {
+      const urlBackend = process.env.VUE_APP_VAPT_LIST_FILTERED;
+      axios.post(urlBackend, data).then(res => {
         if (res.data.length > 0 ){
           this.dialog = false;
           this.$emit('updateDataRemediation', res.data); // invio i dati alla pagina dashboard

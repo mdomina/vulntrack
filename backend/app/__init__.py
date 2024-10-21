@@ -14,8 +14,10 @@ from app.route.admin import router as admin
 from app.route.auth import router as auth
 from app.route.users import router as users
 from app.route.vatp import router as vapt
+from app.route.recheck import router as recheck
 
 app.include_router(admin)
 app.include_router(auth)
 app.include_router(users)
 app.include_router(vapt)
+app.include_router(recheck)

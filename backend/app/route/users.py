@@ -1,8 +1,8 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends
 
-from backend.app.model.model import User
-from backend.app.utility.users import get_current_user
+from app.model.model import User
+from app.utility.users import get_current_user
 
 
 router = APIRouter(prefix="/users")

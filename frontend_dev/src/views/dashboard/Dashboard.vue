@@ -147,7 +147,8 @@ export default {
             this.nomeAppFiltrata = nomeApp + ' - ' + typeApp
         },
         getDataRemediation() {
-            axios.get("/remediadion/data/dashboard").then(res => {
+            const urlBackend = process.env.VUE_APP_VAPT_DATA_DASHBOARD;
+            axios.get(urlBackend).then(res => {
                 this.dataRemediation = res.data
             })
         }

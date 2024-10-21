@@ -4,12 +4,11 @@ import vuetify from './plugins/vuetify'
 import router from './router'
 import store from './store/index.js'
 import './plugins/base'
-import vue_config, { API_URL } from './vue_config.js';
 
 // AXIOS
 import axios from 'axios';
 //dev
-axios.defaults.baseURL = API_URL;
+axios.defaults.baseURL = process.env.VUE_APP_BASE_URL;
 //prod
 axios.interceptors.request.use((config) => {
    let token = localStorage.getItem('token');

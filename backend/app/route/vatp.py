@@ -1,9 +1,9 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
-from backend.app.database.database import MyDB
-from backend.app.model.model import InputNomeApp, User
-from backend.app.utility.mapping_vulnerability import MappingVulnerability
-from backend.app.utility.users import get_current_user
+from app.database.database import MyDB
+from app.model.model import InputNomeApp, User
+from app.utility.mapping_vulnerability import MappingVulnerability
+from app.utility.users import get_current_user
 
 router = APIRouter(prefix="/vapt")
 mydb = MyDB()

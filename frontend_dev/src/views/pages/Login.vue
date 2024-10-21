@@ -43,7 +43,8 @@ export default {
     }),
     methods: {
         login() {
-            axios.post('/token', this.dataUser).then((response) => {
+            const urlBackend = process.env.VUE_APP_AUTH_TOKEN;
+            axios.post(urlBackend, this.dataUser).then((response) => {
                 localStorage.setItem('token', response.data.access_token);
                 this.$store.dispatch('actSetAuth');
                 this.$store.dispatch('userInfo').then(()=>{

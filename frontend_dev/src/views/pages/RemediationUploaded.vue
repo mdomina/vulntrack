@@ -53,8 +53,8 @@ export default {
     },
     methods: {
         getListaRemediation(){
-            axios.get("/remediadions/list").then(res => {
-                
+            const urlBackend = process.env.VUE_APP_VAPT_LIST;
+            axios.get(urlBackend).then(res => {
                 this.remediations = res.data
             })
         },
@@ -70,7 +70,7 @@ export default {
             this.dialogDelete = false
         },
         deleteItemConfirm(){
-            let url = '/items/' + this.docDaEliminare.id;
+            let url = process.env.ADMIN_ITEMS + this.docDaEliminare.id;
             axios.delete(url).then(res => {
                 this.removeItem(this.docDaEliminare)
                 this.dialogDelete = false

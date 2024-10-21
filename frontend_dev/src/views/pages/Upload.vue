@@ -44,8 +44,9 @@ export default {
             formData.append("file", this.file);
             // Add other form data
             if (this.valid) {
+                const urlBackend = process.env.VUE_APP_ADMIN_UPLOADFILE;
                 // Use axios to send the file to the endpoint
-                axios.post("/uploadfile", formData, { headers: { "Content-Type": "multipart/form-data" } }).then(res => {
+                axios.post(urlBackend, formData, { headers: { "Content-Type": "multipart/form-data" } }).then(res => {
                     // disattivo la barra di caricamento
                     this.progress = false
 

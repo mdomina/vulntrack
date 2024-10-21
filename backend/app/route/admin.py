@@ -2,10 +2,10 @@ from io import BytesIO
 from typing import Annotated
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from app.database.database import MyDB
-from backend.app.model.model import User
-from backend.app.utility.convert_to_json import convert_data
-from backend.app.utility.estrazione_mese import estrai_mese
-from backend.app.utility.users import get_current_user
+from app.model.model import User
+from app.utility.convert_to_json import convert_data
+from app.utility.estrazione_mese import estrai_mese
+from app.utility.users import get_current_user
 
 def check_admin(current_user: Annotated[User, Depends(get_current_user)]):
     """Funzione che controlla se l'utente è admin"""

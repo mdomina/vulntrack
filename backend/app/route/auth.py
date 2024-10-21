@@ -1,10 +1,10 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from backend.app.model.model import LoginData, Token
-from backend.app.utility.jwt_token import create_access_token
-from backend.app.utility.login import authenticate_user
-from backend.app.utility.users import get_auth
+from app.model.model import LoginData, Token
+from app.utility.jwt_token import create_access_token
+from app.utility.login import authenticate_user
+from app.utility.users import get_auth
 
 
 router = APIRouter(prefix="/auth")
@@ -25,6 +25,6 @@ async def login_for_access_token(login_data: LoginData):
     return {"access_token": access_token, "token_type": "bearer"}
 
 # Endpoint per controllare se l'utente è autenticato
-@router.get("check")
+@router.get("/check")
 async def auth_check(auth: Annotated[bool, Depends(get_auth)]):
     return auth
