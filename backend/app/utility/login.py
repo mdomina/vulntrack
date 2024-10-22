@@ -2,14 +2,13 @@ from app.model.user_model import UserInDB
 from app.utility.password import HashPassword
 from app.database.database import MyDB
 
-my_db = MyDB()
 
 def get_user(username: str):
     """Questa funzione cerca l'utente nel database con lo username specificato"""
+    my_db = MyDB()
     users_collection = my_db.get_users_collection()
     user_dict = users_collection.find_one({"username": username})
     if user_dict:
-        print(user_dict)
         return UserInDB(**user_dict)# Crea un oggetto UserInDB da questo dizionario
     else:
         return None

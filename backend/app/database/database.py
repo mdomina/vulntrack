@@ -15,7 +15,25 @@ class MyDB():
         self.db = self.client['vulntrack']
         self.collection_vapt = self.db['vapt']
         self.collection_users = self.db['users']
-    
+
+        
+    def get_all_users(self):
+        """"recupera tutti gli utenti"""
+        try:
+            return self.collection_users.find()
+        except Exception as e:
+            logger.error(f"recupero utenti : {e}")
+
+    def insert_user(self, document) -> bool:
+        """inserisce un utente"""
+        try:
+            result  = self.collection_users.insert_one(document)
+            return result.inserted_id is not None
+        except Exception as e:
+            # Stampa o log dell'eccezione per il debug
+            logger.error(f"durante l'inserimento dell'utente: {e}")
+            return False
+
     def get_users_collection(self):
         """
         controlla se esiste la collection users
@@ -23,13 +41,21 @@ class MyDB():
         return self.db.get_collection('users')
 
     def insert(self, document):
+        """
+        Inserisce un nuovo documento nella collezione 'vapt'.
+        
+        Solleva:
+            - HTTPException con status code 400 se il documento è già presente.
+            - Logga l'errore in caso di altri problemi durante l'inserimento.
+        """
         try:
             # Inserisci un documento nella tua collezione
             self.collection_vapt.insert_one(document)
         except DuplicateKeyError as e:
-           raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File esistente")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File esistente")
         except Exception as e:
             logger.error(f"inserimento database: {e}")
+
     
     def ping(self):
         try:
@@ -111,13 +137,14 @@ class MyDB():
         """
 
         # Costruisce la query per cercare l'email ignorando maiuscole/minuscole
-        query = {"email": {"$regex": f"^{email}$", "$options": "i"}}
+        query = {"email": email}
 
         # Cerca se l'email esiste nella collezione 'users'
         result = self.collection_users.find_one(query)
 
         # Se trova un risultato, ritorna True, altrimenti False
         return result is not None
+
 if __name__=='__main__':
     db = MyDB()
     print(db.aggregazione())
