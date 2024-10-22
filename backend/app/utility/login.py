@@ -9,6 +9,7 @@ def get_user(username: str):
     users_collection = my_db.get_users_collection()
     user_dict = users_collection.find_one({"username": username})
     if user_dict:
+        print(user_dict)
         return UserInDB(**user_dict)# Crea un oggetto UserInDB da questo dizionario
     else:
         return None

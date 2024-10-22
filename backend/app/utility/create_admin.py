@@ -16,6 +16,8 @@ def create_admin_if_not_exists():
             "username": "admin",
             "password": password,  
             "role": "admin",
-            "email":"admin@admin.it"
+            "email":"admin@admin.it",
+            "name": "admin",
+            "surname":"admin"
         }
         users.insert_one(admin_user)
