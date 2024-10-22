@@ -83,6 +83,12 @@ export default new Router({
                     component: () => import('@/views/pages/RemediationList'),
                 },
 
+                {
+                    name: 'Users',
+                    path: 'pages/Users',
+                    component: () => import('@/views/pages/Users'),
+                },
+
             ]
         },
         {
