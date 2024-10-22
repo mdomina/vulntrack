@@ -84,9 +84,9 @@ export default new Router({
                 },
 
                 {
-                    name: 'Users',
-                    path: 'pages/Users',
-                    component: () => import('@/views/pages/Users'),
+                    name: 'AdminDashboard',
+                    path: 'pages/AdminDashboard',
+                    component: () => import('@/views/pages/AdminDashboard'),
                 },
 
             ]
