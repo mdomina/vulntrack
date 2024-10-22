@@ -12,8 +12,9 @@ class MyDB():
         mongo_host = settings.MONGO_HOST
         mongo_port = int(settings.MONGO_PORT)
         self.client = MongoClient(mongo_host, mongo_port)
-        self.db = self.client.vulntrack
-        self.collection_vapt = self.db.vapt
+        self.db = self.client['vulntrack']
+        self.collection_vapt = self.db['vapt']
+        self.collection_users = self.db['users']
     
     def get_users_collection(self):
         """
@@ -98,6 +99,25 @@ class MyDB():
             logger.error(f"eliminazione remediation: {e}")
             return None
     
+    def email_exists(self, email: str) -> bool:
+        """
+        Verifica se un'email esiste già nella collezione 'users' di MongoDB.
+
+        Args:
+            email (str): L'email da verificare.
+
+        Returns:
+            bool: True se l'email esiste già nella collezione, False altrimenti.
+        """
+
+        # Costruisce la query per cercare l'email ignorando maiuscole/minuscole
+        query = {"email": {"$regex": f"^{email}$", "$options": "i"}}
+
+        # Cerca se l'email esiste nella collezione 'users'
+        result = self.collection_users.find_one(query)
+
+        # Se trova un risultato, ritorna True, altrimenti False
+        return result is not None
 if __name__=='__main__':
     db = MyDB()
     print(db.aggregazione())

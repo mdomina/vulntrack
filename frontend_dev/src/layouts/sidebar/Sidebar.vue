@@ -21,7 +21,7 @@
         <v-list-item-content>
           <v-list-item-title>{{getUsername}}</v-list-item-title>
           <v-list-item-subtitle class="caption"
-            >level: {{ getLevel }}</v-list-item-subtitle
+            >role: {{ getLevel }}</v-list-item-subtitle
           >
         </v-list-item-content>
       </v-list-item>
@@ -94,31 +94,31 @@ export default {
         title: "Dashboard",
         icon: "mdi-view-dashboard",
         to: "/dashboard/dashboard",
-        level: "user"
+        role: "user"
       },
       {
         title: "Lista Vulnerabilità",
         icon: "mdi-radioactive",
         to: "/list/remediation",
-        level:"user"
+        role:"user"
       },
       {
         title: "Recheck",
         icon: "mdi-file-find",
         to: "/list/recheck",
-        level:"user"
+        role:"user"
       },
       {
         title: "Upload VAPT",
         icon: "mdi-file-upload",
         to: "/upload/remediation",
-        level:"admin"
+        role:"admin"
       },
       {
         title: "Lista VAPT",
         icon: "mdi-format-list-bulleted",
         to: "/uploaded/remediation",
-        level:"admin"
+        role:"admin"
       },
     ]
   }),
@@ -139,7 +139,7 @@ export default {
       return this.items;
     } else {
       // Se l'utente non è un amministratore, filtra gli elementi che sono solo per gli utenti.
-      return this.items.filter(item => item.level === 'user');
+      return this.items.filter(item => item.role === 'user');
     }
   }
   },

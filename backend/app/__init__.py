@@ -1,5 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.utility.create_admin import create_admin_if_not_exists
+
+# se non esiste l'utente admin lo crea 
+create_admin_if_not_exists()
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,

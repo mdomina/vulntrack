@@ -1,7 +1,8 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.database.database import MyDB
-from app.model.model import InputNomeApp, User
+from app.model.model import InputNomeApp
+from app.model.user_model import UserInDB
 from app.utility.mapping_vulnerability import MappingVulnerability
 from app.utility.users import get_current_user
 
@@ -9,7 +10,7 @@ router = APIRouter(prefix="/vapt")
 mydb = MyDB()
 
 @router.post("/list/filtered")
-async def vapt_list_name(name_input: InputNomeApp ,current_user: Annotated[User, Depends(get_current_user)]):
+async def vapt_list_name(name_input: InputNomeApp ,current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """Endpoint per avere la lista vapt e recheck filtrati per nome"""
     
     remediation = mydb.ricerca_filtrata({'nome': name_input.nome, 'type': name_input.type})
@@ -17,7 +18,7 @@ async def vapt_list_name(name_input: InputNomeApp ,current_user: Annotated[User,
     return mapping.format_vulerabiliy_name(remediation)
 
 @router.get("/list")
-async def vapt_list_name(current_user: Annotated[User, Depends(get_current_user)]):
+async def vapt_list_name(current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """Endpoint per avere la lista di tutti i remediation (nome, anno, codice elettra, id mongo e type)"""
     try:
         return mydb.remediations_list()
@@ -28,7 +29,7 @@ async def vapt_list_name(current_user: Annotated[User, Depends(get_current_user)
         )
 
 @router.get("/data")
-async def remediation_data(current_user: Annotated[User, Depends(get_current_user)]):
+async def remediation_data(current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """Endpoint per avere tutti i remediation"""
     try:
         remediation = mydb.ricerca_all()
@@ -42,7 +43,7 @@ async def remediation_data(current_user: Annotated[User, Depends(get_current_use
         )
 
 @router.get("/names/app")
-async def list_names_app(current_user: Annotated[User, Depends(get_current_user)]):
+async def list_names_app(current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """Endpoint per avere i nomi di tutte le app testate"""
     try:
         return mydb.remediation_list_name()
@@ -53,7 +54,7 @@ async def list_names_app(current_user: Annotated[User, Depends(get_current_user)
         )
 
 @router.get("/data/dashboard")
-async def vapt_data(current_user: Annotated[User, Depends(get_current_user)]):
+async def vapt_data(current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """Endpoint per avere la lista vapt da inserire nella dashboard"""
     remediation = mydb.ricerca_filtrata({'type': 'vapt'})
     mapping = MappingVulnerability()
