@@ -144,6 +144,25 @@ class MyDB():
 
         # Se trova un risultato, ritorna True, altrimenti False
         return result is not None
+    
+    def delete_user(self, email: str) -> bool:
+        """
+        Elimina un utente dalla collezione 'users' in base all'indirizzo email.
+
+        Args:
+            email (str): L'indirizzo email dell'utente da eliminare.
+        
+        Returns:
+            bool: True se l'utente è stato eliminato con successo, False altrimenti.
+        """
+        try:
+            result = self.collection_users.delete_one({"email": email})
+            # Verifica se un documento è stato effettivamente eliminato
+            return result.deleted_count > 0
+        except Exception as e:
+            logger.error(f"Errore durante l'eliminazione dell'utente: {e}")
+            return False
+
 
 if __name__=='__main__':
     db = MyDB()

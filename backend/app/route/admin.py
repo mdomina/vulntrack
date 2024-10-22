@@ -1,14 +1,8 @@
-import secrets
-from io import BytesIO
 from typing import Annotated, List
-import uuid
-import bcrypt
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from datetime import datetime
 from app.database.database import MyDB
-from app.model.user_model import UserDataResponseModel, UserInDB
-# from app.utility.convert_to_json import convert_data
-from app.utility.estrazione_mese import estrai_mese
+from app.model.user_model import DeleteUser, UserDataResponseModel, UserInDB
 from app.utility.users import get_current_user
 from app.model.user_model import NewUserModel
 
@@ -78,3 +72,25 @@ async def elenco_user():
     except Exception as e:
         # Log dell'eccezione se necessario
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to retrieve users list")
+    
+
+@router.delete("/users/delete", response_description="Eliminazione dell'utente")
+async def delete_user(delete_user: DeleteUser, current_user: Annotated[UserInDB, Depends(get_current_user)]):
+    """
+    Elimina un utente in base all'email passata nel body della richiesta.
+    """
+    if current_user.email == delete_user.email:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="you can't eliminate yourself")
+    try:
+        mydb = MyDB()
+        # Chiama il metodo per eliminare l'utente
+        success = mydb.delete_user(delete_user.email)
+
+        if not success:
+            return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        
+        return {"msg": "User successfully deleted"}
+    
+    except Exception as e:
+        # Log dell'errore e solleva un'eccezione HTTP
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to delete user")

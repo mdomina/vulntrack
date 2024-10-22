@@ -92,3 +92,7 @@ class NewUserModel(BaseModel):
         """Genera lo username automaticamente dopo la validazione."""
         self.username = f"{self.name[0].lower()}.{self.surname.lower().replace(' ', '')}"
 
+
+class DeleteUser(BaseModel):
+    """Modello per la cancellazione di un utente."""
+    email: EmailStr
