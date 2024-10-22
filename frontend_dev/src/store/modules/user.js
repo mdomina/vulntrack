@@ -3,7 +3,7 @@ import router from '@/router'
 
 const state = {
     auth: !!localStorage.getItem('token'), //controlla che sia presente il token, ritorna true o false
-    level: '',
+    role: '',
     username: ''
 };
 const getters = {
@@ -11,7 +11,7 @@ const getters = {
         return state.auth
     },
     getLevel: state =>{
-        return state.level
+        return state.role
     },
     getUsername: state => {
         return state.username
@@ -21,8 +21,8 @@ const mutations = {
     setAtuh: (state, authValue) =>{
         return state.auth = authValue
     },
-    setLevel: (state, level) =>{
-        return state.level = level
+    setLevel: (state, role) =>{
+        return state.role = role
     },
     setUsername: (state, username) =>{
         return state.username = username
@@ -31,7 +31,7 @@ const mutations = {
 const actions = {
     userInfo: (ctx) => {
         axios.get('/users/me').then((res) => {
-            ctx.commit('setLevel', res.data.level);
+            ctx.commit('setLevel', res.data.role);
             ctx.commit('setUsername', res.data.username);
         })
     },

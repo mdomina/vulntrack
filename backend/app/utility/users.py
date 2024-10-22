@@ -1,8 +1,7 @@
 from typing import Annotated
 from fastapi import HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
-from app.model.model import UserInDB
-from app.database.fake_db import fake_users_db
+from app.model.user_model import UserInDB
 from app.config.settings import Settings
 from app.utility.jwt_token import get_user_from_token
 from app.database.database import MyDB
@@ -19,7 +18,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 settings = Settings()
 
-def get_user(username: str):
+def get_user(username: str) -> UserInDB:
     """Questa funzione cerca l'utente nel database con lo username specificato"""
     users_collection = my_db.get_users_collection()
     user_dict = users_collection.find_one({"username": username})
@@ -30,7 +29,7 @@ def get_user(username: str):
     
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> UserInDB:
     """Recupera i dati utente dal JWT"""
     
     # Creiamo un'eccezione per i casi in cui non possiamo validare le credenziali dell'utente

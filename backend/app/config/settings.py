@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 import os 
 
 class Settings(BaseSettings):
@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     ALGORITHM : str = "HS256"
     
     # Il tempo di scadenza del token di accesso in minuti
-    ACCESS_TOKEN_EXPIRE_MINUTES = 100
+    ACCESS_TOKEN_EXPIRE_MINUTES:int = 100
 
     # Ottieni MONGO_HOST e MONGO_PORT dalla variabile d'ambiente o usa un valore di default
     MONGO_HOST: str = os.environ.get("MONGODB_HOST", "127.0.0.1")

@@ -1,7 +1,7 @@
 from app.database.database import MyDB
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.model.model import InputNomeApp, User
+from app.model.model import InputNomeApp
 from app.utility.format_rechecks import filter_rechecks
 from app.utility.mapping_vulnerability import MappingVulnerability
 from app.utility.users import get_current_user
