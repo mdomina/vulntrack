@@ -29,8 +29,8 @@ app.include_router(users)
 app.include_router(vapt)
 app.include_router(recheck)
 
-from app.utility.insert_mongo import Insert_Mongo
+from app.utility.insert_mongo import InsertMongo
 
-insert_Mongo = Insert_Mongo()
+insert_Mongo = InsertMongo()
 
 insert_Mongo.main()
