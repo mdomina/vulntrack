@@ -4,7 +4,7 @@ import os
 
 # Ottieni la cartella corrente
 current_directory = os.getcwd()
-file_log = os.path.join(current_directory, 'log/app.log')
+file_log = os.path.join(current_directory, 'log','app.log')
 
 # crea il logger
 logger = logging.getLogger(__name__)
