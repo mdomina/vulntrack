@@ -120,6 +120,12 @@ export default {
         to: "/uploaded/remediation",
         role:"admin"
       },
+      {
+        title: "Admin Dashboard",
+        icon: "mdi-format-list-bulleted",
+        to: "/dashboard/AdminDashboard",
+        role:"admin"
+      },
     ]
   }),
   computed: {

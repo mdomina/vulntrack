@@ -4,8 +4,8 @@
       <v-col cols="12" sm="12">
         <v-card>
           <v-card-title>
-            <h1>Admin Dashboard</h1>
-            <h2>Dati Utente</h2>
+            <h2>Admin Dashboard</h2>
+            <v-spacer></v-spacer>
             <v-spacer></v-spacer>
             <v-btn @click="showDialog = true">
               <v-icon>mdi-plus</v-icon>

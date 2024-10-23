@@ -24,8 +24,8 @@
             item-value="value" />
           
           <!-- Selettore per l'ente dell'utente -->
-          <v-select v-model="user.ente" :items="enti" label="Ente" required
-            :rules="[v => !!v || 'Seleziona un ente']" item-text="name" item-value="id" />
+          <!-- <v-select v-model="user.ente" :items="enti" label="Ente" required
+            :rules="[v => !!v || 'Seleziona un ente']" item-text="name" item-value="id" /> -->
         </v-form>
       </v-card-subtitle>
       <v-card-actions>
@@ -58,14 +58,19 @@ export default {
         name: '',
         surname: '',
         password: '',
-        role: '',
-        ente: '' // Campo per memorizzare l'ente selezionato
+        role: ''
+        //ente: '' // Campo per memorizzare l'ente selezionato
       },
       roles: [ // Opzioni per il selettore dei ruoli
         { value: 'admin', name: 'Admin' },
         { value: 'user', name: 'User' }
       ],
-      enti: [], // Elenco degli enti disponibile nella selezione
+      // enti: [ // Elenco degli enti (città lombarde)
+      //   { id: 1, name: 'Milano' },
+      //   { id: 2, name: 'Bergamo' },
+      //   { id: 3, name: 'Brescia' },
+      //   { id: 4, name: 'Como' }
+      // ],
       // Regole per la validazione dei campi
       emailRules: [
         v => !!v || 'Email è richiesta',
@@ -85,7 +90,7 @@ export default {
     };
   },
   mounted() {
-    this.getEnti(); // Carica l'elenco degli enti al montaggio del componente
+    // Qui non è necessario chiamare getEnti poiché gli enti sono già definiti staticamente.
   },
   methods: {
     close() {
@@ -96,13 +101,13 @@ export default {
       if (this.$refs.form.validate()) {
         try {
           // Invia i dati dell'utente all'API per la registrazione
-          const response = await axios.post('/gui/user/register', {
+          const response = await axios.post('/route/admin/register', {
             email: this.user.email,
             name: this.user.name,
             surname: this.user.surname,
             password: this.user.password,
             role: this.user.role,
-            ente: this.user.ente // Includi l'ente nella richiesta
+            //ente: this.user.ente // Includi l'ente nella richiesta
           });
 
           if (response.status === 200) {
@@ -126,15 +131,6 @@ export default {
         this.$toast.error("Per favore, completa il modulo correttamente."); // Messaggio di errore per validazione fallita
       }
     },
-    async getEnti() {
-      // Richiama l'API per ottenere l'elenco degli enti
-      try {
-        const response = await axios.get('/gui/enti/list');
-        this.enti = response.data.enti; // Aggiorna la lista degli enti
-      } catch (error) {
-        this.$toast.error('Errore durante il caricamento degli enti'); // Messaggio di errore
-      }
-    },
     toggleShowPassword() {
       this.showPassword = !this.showPassword; // Alterna la visibilità della password
     },
@@ -146,7 +142,7 @@ export default {
         surname: '',
         password: '',
         role: '',
-        ente: '' // Resetta il campo ente
+        //ente: '' // Resetta il campo ente
       };
     }
   }

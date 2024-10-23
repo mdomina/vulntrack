@@ -85,7 +85,7 @@ export default new Router({
 
                 {
                     name: 'AdminDashboard',
-                    path: 'pages/AdminDashboard',
+                    path: 'dashboard/AdminDashboard',
                     component: () => import('@/views/pages/AdminDashboard'),
                 },
 
