@@ -54,7 +54,6 @@ export default {
       headers: [
         { text: 'Email', value: 'email', align: 'center' },
         { text: 'Name', value: 'name', align: 'center' },
-        { text: 'Surname', value: 'surname', align: 'center' },
         { text: 'Username', value: 'username', align: 'center' },
         { text: 'Role', value: 'role', align: 'center' },
         { text: 'Actions', value: 'actions', align: 'center', sortable: false } // Aggiungi colonna per le azioni
@@ -67,9 +66,9 @@ export default {
     };
   },
   methods: {
-    getUsersList(userId) {
+    getUsersList() {
       this.loading = true;
-      axios.get('http://localhost:8000/admin/users/list')
+      axios.get(process.env.VUE_APP_ADMIN_USER_LIST)
         .then((response) => {
           console.log("Response data:", response.data); // Log the response data
           this.users = response.data.users || []; // Ensure this is correct based on your response
