@@ -5,3 +5,4 @@ pymongo
 pydantic-settings
 bcrypt
 passlib
+cvss
