@@ -96,28 +96,28 @@ export default {
     close() {
       this.$emit('update:dialog', false); // Chiudi il dialog e aggiorna lo stato nel componente genitore
     },
-    async submit() {
+    submit() {
       // Controlla se il modulo è valido
       if (this.$refs.form.validate()) {
-        try {
-          // Invia i dati dell'utente all'API per la registrazione
-          const response = await axios.post('/admin/register', {
-            email: this.user.email,
-            name: this.user.name,
-            surname: this.user.surname,
-            password: this.user.password,
-            role: this.user.role,
-            //ente: this.user.ente // Includi l'ente nella richiesta
-          });
-
+        axios.post("http://127.0.0.1:8000/admin/users/add", {
+          email: this.user.email,
+          name: this.user.name,
+          surname: this.user.surname,
+          password: this.user.password,
+          role: this.user.role,
+          //ente: this.user.ente // Includi l'ente nella richiesta se necessario
+        })
+        .then((response) => {
           if (response.status === 200) {
             this.$emit('add-user', this.user); // Passa i dati dell'utente al componente genitore
             this.close(); // Chiudi il dialog
             this.resetForm(); // Resetta il modulo
+            this.$toast.success("Utente aggiunto con successo!"); // Notifica di successo
           } else {
             throw new Error(`Errore nel server: ${response.statusText}`);
           }
-        } catch (error) {
+        })
+        .catch((error) => {
           // Gestione degli errori basata sul codice di stato
           if (error.response && error.response.status === 403) {
             this.$toast.error("Non hai i permessi per aggiungere utenti!");
@@ -126,7 +126,7 @@ export default {
           } else {
             this.$toast.error("Errore interno del server. Riprova più tardi.");
           }
-        }
+        });
       } else {
         this.$toast.error("Per favore, completa il modulo correttamente."); // Messaggio di errore per validazione fallita
       }

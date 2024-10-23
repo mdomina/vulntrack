@@ -12,7 +12,7 @@
           </v-card-title>
           <v-data-table :headers="headers" :items="users" item-key="id" class="elevation-1" :loading="loading">
             <template v-slot:item.actions="{ item }">
-              <v-btn @click="openDeleteDialog(item.id)" color="red">
+              <v-btn @click="openDeleteDialog(item.email)" color="red">
                 <v-icon color="white">mdi-delete</v-icon>
               </v-btn>
             </template>
@@ -20,7 +20,10 @@
         </v-card>
       </v-col>
     </v-row>
+
     <add-user-dialog :dialog.sync="showDialog" @add-user="addUser" />
+
+    <!-- Delete confirmation dialog -->
     <v-dialog v-model="dialogDelete" persistent max-width="500px">
       <v-card>
         <v-card-title class="text-h5">Conferma eliminazione</v-card-title>
@@ -60,53 +63,59 @@ export default {
     };
   },
   methods: {
-    async getUsersList() {
+    getUsersList() {
       this.loading = true;
-      try {
-        const response = await axios.get('/admin/user/list');
-        this.users = response.data.users || [];
-      } catch (error) {
-        // Sostituzione console.log con toast per l'errore di caricamento
-        this.$toast.error('Errore nel caricamento degli utenti. Riprova più tardi.'); 
-      } finally {
-        this.loading = false;
-      }
+      axios.get('http://127.0.0.1:8000/admin/users/list')
+        .then(response => {
+          this.users = response.data.users || [];
+        })
+        .catch(error => {
+          this.$toast.error('Errore nel caricamento degli utenti. Riprova più tardi.');
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
-    async deleteUser(userId) {
+
+    deleteUser(userToDelete) {
       this.dialogDelete = false; // Chiudi il dialogo
-      try {
-        const response = await axios.delete(`/gui/user/delete/${userId}`);
-        if (response.status === 200) {
-          this.$toast.success("Utente eliminato"); // Notifica di successo
-          this.users = this.users.filter(user => user.id !== userId);
-        }
-      } catch (error) {
-        // Sostituzione console.log con toast per l'errore di eliminazione
-        if (error.response) {
-          switch (error.response.status) {
-            case 403:
-              this.$toast.error('Non hai i permessi necessari per eliminare questo utente.');
-              break;
-            case 404:
-              this.$toast.error('Utente non trovato.');
-              break;
-            case 500:
-              this.$toast.error('Si è verificato un errore interno del server. Riprova più tardi.');
-              break;
-            default:
-              this.$toast.error('Si è verificato un errore durante l\'eliminazione dell\'utente.');
-              break;
+
+      // Invio dell'oggetto con l'email per la cancellazione
+      axios.delete('http://127.0.0.1:8000/admin/users/delete', { data: { email: userToDelete } })
+        .then(response => {
+          if (response.status === 200) {
+            this.$toast.success("Utente eliminato");
+            this.users = this.users.filter(user => user.email !== userToDelete);
           }
-        } else {
-          this.$toast.error('Errore di rete. Si prega di riprovare più tardi.'); // Gestisci errore di rete
-        }
-      }
+        })
+        .catch(error => {
+          if (error.response) {
+            switch (error.response.status) {
+              case 403:
+                this.$toast.error('Non hai i permessi necessari per eliminare questo utente.');
+                break;
+              case 404:
+                this.$toast.error('Utente non trovato.');
+                break;
+              case 500:
+                this.$toast.error('Si è verificato un errore interno del server. Riprova più tardi.');
+                break;
+              default:
+                this.$toast.error('Si è verificato un errore durante l\'eliminazione dell\'utente.');
+                break;
+            }
+          } else {
+            this.$toast.error('Errore di rete. Si prega di riprovare più tardi.');
+          }
+        });
     },
-    openDeleteDialog(userId) {
-      this.currentUserToDelete = userId;
+
+    openDeleteDialog(userEmail) {
+      this.currentUserToDelete = userEmail; // Usa l'email dell'utente per la cancellazione
       this.dialogDelete = true;
     },
-    async addUser(user) {
+
+    addUser(user) {
       this.$toast.success("Utente aggiunto");
       this.users.push(user); 
       setTimeout(() => {
