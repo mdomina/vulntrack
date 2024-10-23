@@ -1,6 +1,7 @@
 from enum import Enum
 import re
-from pydantic import BaseModel, EmailStr, field_validator
+from typing import Optional
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from app.utility.password import HashPassword
 
 class UserRole(Enum):
@@ -14,14 +15,12 @@ class UserRole(Enum):
     """
     ADMIN = "admin"
     USER = "user"
-    HONEYPOT_MANAGER = "honeypot_manager"
 
 class UserDataResponseModel(BaseModel):
     """Dati utente in uscita"""
     name: str
     username: str
     email: EmailStr
-    password: str
     role: UserRole 
 
 class UserInDB(BaseModel):
@@ -36,8 +35,7 @@ class UserInDB(BaseModel):
     class Config:
         # Ignora i campi extra come `_id` senza sollevare errori
         extra = "ignore"
-    
-    
+
 class NewUserModel(BaseModel):
     """
     Modello di input per creare un nuovo utente nel sistema.
@@ -48,57 +46,33 @@ class NewUserModel(BaseModel):
         surname (str): Il cognome dell'utente.
         password (str): La password dell'utente.
         role (UserRole): Il ruolo dell'utente (admin o user).
+        username (str): Lo username generato automaticamente (prima lettera del nome + cognome).
     """
     email: EmailStr
     name: str
     surname: str
     password: str
     role: UserRole
-    
+    username: Optional[str] = None  # Lo username verrà generato
+
     @field_validator('email')
     def normalize_email(cls, v: str) -> str:
-        """
-        Validatore che normalizza l'email.
-
-        Questo validatore:
-        - Rimuove eventuali spazi bianchi prima e dopo l'email con `strip()`.
-        - Converte l'email in minuscolo con `lower()`.
-        """
+        """Normalizza l'email."""
         return v.strip().lower()
-    
+
     @field_validator('name')
     def normalize_name(cls, v: str) -> str:
-        """
-        Validatore che normalizza il nome.
-
-        Questo validatore:
-        - Rimuove eventuali spazi bianchi prima e dopo l'email con `strip()`.
-        - Converte l'email in minuscolo con `lower()`.
-        """
+        """Normalizza il nome."""
         return v.strip().lower()
-    
+
     @field_validator('surname')
     def normalize_surname(cls, v: str) -> str:
-        """
-        Validatore che normalizza il cognome.
-
-        Questo validatore:
-        - Rimuove eventuali spazi bianchi prima e dopo l'email con `strip()`.
-        - Converte l'email in minuscolo con `lower()`.
-        """
+        """Normalizza il cognome."""
         return v.strip().lower()
 
     @field_validator('password')
     def validate_new_password(cls, v: str) -> str:
-        """
-        Validatore che controlla la complessità della password. Ritorna la password cifrata
-
-        Questo validatore:
-        - Verifica che la password contenga almeno 12 caratteri.
-        - Controlla che la password contenga almeno un numero.
-        - Verifica che la password abbia almeno un carattere speciale.
-        - Assicura che ci sia almeno una lettera maiuscola.
-        """
+        """Validatore che controlla la complessità della password e la cifra."""
         if len(v) < 12:
             raise ValueError('La password deve contenere almeno 12 caratteri')
         
@@ -113,3 +87,12 @@ class NewUserModel(BaseModel):
         
         hash_password = HashPassword()
         return hash_password.hash_password(v)
+
+    def model_post_init(self, __context):
+        """Genera lo username automaticamente dopo la validazione."""
+        self.username = f"{self.name[0].lower()}.{self.surname.lower().replace(' ', '')}"
+
+
+class DeleteUser(BaseModel):
+    """Modello per la cancellazione di un utente."""
+    email: EmailStr

@@ -1,20 +1,14 @@
-import secrets
-from io import BytesIO
-from typing import Annotated
-import uuid
-import bcrypt
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from typing import Annotated, List
+from fastapi import APIRouter, Depends, HTTPException, status
 from datetime import datetime
 from app.database.database import MyDB
-from app.model.user_model import UserInDB
-# from app.utility.convert_to_json import convert_data
-from app.utility.estrazione_mese import estrai_mese
+from app.model.user_model import DeleteUser, UserDataResponseModel, UserInDB
 from app.utility.users import get_current_user
 from app.model.user_model import NewUserModel
 
 def check_admin(current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """Funzione che controlla se l'utente è admin"""
-    if current_user.role != 'admin':
+    if current_user.role.value != 'admin':
         raise HTTPException(status_code=403, detail="Permesso negato")
     return current_user
 
@@ -36,57 +30,25 @@ async def delete_item(item_id: str):
             detail="Errore eliminazione documento",
         )
 
-# @router.post("/uploadfile")
-# async def create_upload_file(file: Annotated[UploadFile, File()]):
-    
-#     if file.filename.endswith('.xlsx'):
-#         contents = await file.read()  # read file
-#         data = BytesIO(contents)  # convert bytes to BytesIO
-#         df = convert_data(data) # il file viene letto da pandas e ritorna un json
-#         document = format(file.filename)
-#         document['mese'] = estrai_mese(df)
-#         document['data'] = df
-#         mydb.insert(document)
-#         return {"filename": file.filename}
-#     else:
-#         raise HTTPException(status_code=400, detail="Invalid file type")
-
-@router.post("/user/register",response_description="Conferma della registrazione dell'utente")
+@router.post("/users/add",response_description="Conferma della registrazione dell'utente")
 async def register_user(user: NewUserModel):
-    """
-    Registra un nuovo utente nel database.
-
-    **Parametri**:
-    - **user** (NewUserModel): Oggetto contenente le informazioni dell'utente da registrare.
-
-    **Risposte**:
-    - **200 OK**: Restituisce un messaggio di conferma della registrazione dell'utente.
-    - **403 Forbidden**: Se l'utente non ha i permessi per creare nuovi utenti.
-    - **500 Internal Server Error**: Se si verifica un errore durante la registrazione dell'utente.
-    """
+    """"""
     mydb = MyDB()
     
     # Controlla se l'email è già presente nel database
-    mydb
-    if mydb.email_exists(index="netpot-user", email=user.email):
+    if mydb.email_exists(email=user.email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already in use")
+   
+    # Converte il modello in dizionario
+    dic_user = user.model_dump()
     
-    # Generazione username
-    username = f"{user.name.lower().replace(' ', '')}.{user.surname.lower().replace(' ', '')}"
+    # Converti l'enum UserRole in stringa
+    dic_user['role'] = user.role.value  # Converti UserRole.USER o UserRole.ADMIN in 'user' o 'admin'
     
-    # Dizionario dell'utente da inserire in Elasticsearch
-    dic_user = {
-        "timestamp": datetime.now(),
-        "email": user.email,
-        "name": user.name,
-        "surname": user.surname,
-        "username": username,
-        "password": user.password,
-        "role": user.role.value
-    }
+    dic_user['timestamp'] = datetime.now()
 
     # Inserimento nel database Elasticsearch
-    result = mydb.insert(dic_user)
+    result = mydb.insert_user(dic_user)
     
     # Verifica del risultato e restituzione della conferma o sollevamento di eccezione
     if result:
@@ -94,3 +56,41 @@ async def register_user(user: NewUserModel):
     
     # Se qualcosa va storto, restituiamo un errore 500
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
+
+@router.get("/users/list", response_model=List[UserDataResponseModel])
+async def elenco_user():
+    """"""
+    try:
+        mydb = MyDB()
+        users = mydb.get_all_users()
+        
+        # Converte gli utenti in istanze di UserInDB
+        users = [UserInDB(**user) for user in users]
+    
+        return users
+    
+    except Exception as e:
+        # Log dell'eccezione se necessario
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to retrieve users list")
+    
+
+@router.delete("/users/delete", response_description="Eliminazione dell'utente")
+async def delete_user(delete_user: DeleteUser, current_user: Annotated[UserInDB, Depends(get_current_user)]):
+    """
+    Elimina un utente in base all'email passata nel body della richiesta.
+    """
+    if current_user.email == delete_user.email:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="you can't eliminate yourself")
+    try:
+        mydb = MyDB()
+        # Chiama il metodo per eliminare l'utente
+        success = mydb.delete_user(delete_user.email)
+
+        if not success:
+            return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        
+        return {"msg": "User successfully deleted"}
+    
+    except Exception as e:
+        # Log dell'errore e solleva un'eccezione HTTP
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to delete user")
