@@ -33,4 +33,9 @@ from app.utility.insert_mongo import InsertMongo
 
 insert_Mongo = InsertMongo()
 
-insert_Mongo.main()
+insert_Mongo.sync_databases()
+
+from apscheduler.schedulers.background import BackgroundScheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(insert_Mongo.sync_databases, 'interval', hours=1)
+scheduler.start()
