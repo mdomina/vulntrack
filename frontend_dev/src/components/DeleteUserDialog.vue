@@ -48,7 +48,6 @@ export default {
       headers: [
         { text: 'Email', value: 'email', align: 'center' },
         { text: 'Name', value: 'name', align: 'center' },
-        { text: 'Surname', value: 'surname', align: 'center' },
         { text: 'Username', value: 'username', align: 'center' },
         { text: 'Role', value: 'role', align: 'center' },
         { text: 'Actions', value: 'actions', align: 'center', sortable: false }
@@ -64,7 +63,7 @@ export default {
     async getUsersList() {
       this.loading = true;
       try {
-        const response = await axios.get('/gui/user/list');
+        const response = await axios.get('/admin/user/list');
         this.users = response.data.users || [];
       } catch (error) {
         // Sostituzione console.log con toast per l'errore di caricamento

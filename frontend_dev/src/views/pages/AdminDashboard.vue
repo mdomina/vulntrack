@@ -67,21 +67,24 @@ export default {
     };
   },
   methods: {
-    async getUsersList() {
+    getUsersList(userId) {
       this.loading = true;
-      try {
-        const response = await axios.get('/gui/user/list');
-        this.users = response.data.users || []; // Usa `response.data.users` basato sul tuo modello di risposta
-      } catch (error) {
-        this.$toast.error('Errore:', error);
-      } finally {
-        this.loading = false;
-      }
+      axios.get('http://localhost:8000/admin/users/list')
+        .then((response) => {
+          console.log("Response data:", response.data); // Log the response data
+          this.users = response.data.users || []; // Ensure this is correct based on your response
+          this.loading = false; // Set loading to false after fetching data
+        })
+        .catch((error) => {
+          console.error("Error fetching users:", error); // Log the error for debugging
+          this.$toast.error('Errore:', error);
+          this.loading = false; // Ensure loading is false even on error
+    });
     },
-    async deleteUser(userId) {
+    deleteUser(userId) {
       this.dialogDelete = false; // Chiudi il dialogo
       try {
-        const response = await axios.delete(`/gui/user/delete/${userId}`);
+        const response = axios.delete(`/gui/user/delete/${userId}`);
         if (response.status === 200) {
           this.$toast.success("Utente eliminato");
           this.users = this.users.filter(user => user.id !== userId);
@@ -95,7 +98,7 @@ export default {
       this.dialogDelete = true;
     },
 
-    async addUser(user) {
+    addUser(user) {
       this.$toast.success("Utente aggiunto");
       this.users.push(user); // Aggiungi il nuovo utente alla lista
       setTimeout(() => {

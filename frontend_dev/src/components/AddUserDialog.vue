@@ -101,7 +101,7 @@ export default {
       if (this.$refs.form.validate()) {
         try {
           // Invia i dati dell'utente all'API per la registrazione
-          const response = await axios.post('/route/admin/register', {
+          const response = await axios.post('/admin/register', {
             email: this.user.email,
             name: this.user.name,
             surname: this.user.surname,
