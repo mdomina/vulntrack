@@ -73,7 +73,6 @@ async def elenco_user():
         # Log dell'eccezione se necessario
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to retrieve users list")
     
-
 @router.delete("/users/delete", response_description="Eliminazione dell'utente")
 async def delete_user(delete_user: DeleteUser, current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """
@@ -94,3 +93,9 @@ async def delete_user(delete_user: DeleteUser, current_user: Annotated[UserInDB,
     except Exception as e:
         # Log dell'errore e solleva un'eccezione HTTP
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to delete user")
+
+@router.get("/companies/list")
+async def companies_list():
+    mydb = MyDB()
+    companies = mydb.get_all_companies()
+    return companies
