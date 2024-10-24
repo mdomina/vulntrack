@@ -99,7 +99,8 @@ export default {
     submit() {
       // Controlla se il modulo è valido
       if (this.$refs.form.validate()) {
-        axios.post("http://127.0.0.1:8000/admin/users/add", {
+        const urlApiUserAdd = process.env.VUE_APP_ADMIN_USERS_ADD //variabile da .env
+        axios.post(urlApiUserAdd, {
           email: this.user.email,
           name: this.user.name,
           surname: this.user.surname,

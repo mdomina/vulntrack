@@ -4,6 +4,8 @@ import vuetify from './plugins/vuetify'
 import router from './router'
 import store from './store/index.js'
 import './plugins/base'
+import Toast from 'vue-toastification';
+import 'vue-toastification/dist/index.css'; //importa i css
 
 // AXIOS
 import axios from 'axios';
@@ -32,11 +34,26 @@ axios.interceptors.request.use((config) => {
     return Promise.reject(error);
 });*/
 
-
 // NOTIFICHE
-import Toasted from 'vue-toasted';
-Vue.use(Toasted);
+// import Toasted from 'vue-toasted';
+// Vue.use(Toasted);
 
+// Configurazione delle opzioni di Toastification
+const options = {
+    position: "top-right",
+    timeout: 5000,
+    closeOnClick: true,
+    pauseOnFocusLoss: true,
+    pauseOnHover: true,
+    draggable: true,
+    draggablePercent: 0.6,
+    showCloseButtonOnHover: false,
+    closeButton: "button",
+    icon: true,
+    rtl: false
+ };
+
+ Vue.use(Toast, options);
 
 //GRAFICI
 import VueApexCharts from 'vue-apexcharts'

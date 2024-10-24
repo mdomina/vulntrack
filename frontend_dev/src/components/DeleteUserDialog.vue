@@ -65,7 +65,8 @@ export default {
   methods: {
     getUsersList() {
       this.loading = true;
-      axios.get('http://127.0.0.1:8000/admin/users/list')
+      const urlApiUserList = process.env.VUE_APP_ADMIN_USERS_LIST //variabile globale da .env
+      axios.get(urlApiUserList)
         .then(response => {
           this.users = response.data.users || [];
         })
@@ -81,7 +82,8 @@ export default {
       this.dialogDelete = false; // Chiudi il dialogo
 
       // Invio dell'oggetto con l'email per la cancellazione
-      axios.delete('http://127.0.0.1:8000/admin/users/delete', { data: { email: userToDelete } })
+      const urlApiUserDelete = process.env.VUE_APP_ADMIN_USERS_DELETE //variabile globale da .env
+      axios.delete(urlApiUserDelete, { data: { email: userToDelete } })
         .then(response => {
           if (response.status === 200) {
             this.$toast.success("Utente eliminato");

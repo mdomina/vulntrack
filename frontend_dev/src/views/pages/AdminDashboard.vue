@@ -65,7 +65,8 @@ export default {
   methods: {
     getUsersList() {
       this.loading = true;
-      axios.get("http://127.0.0.1:8000/admin/users/list")
+      const urlApiUserList = process.env.VUE_APP_ADMIN_USERS_LIST //variabile globale da .env
+      axios.get(urlApiUserList)
         .then((response) => {
           console.log("Response data:", response.data); // Log the response data
           this.users = response.data || []; // Assicurati che sia corretto in base alla tua risposta
@@ -73,23 +74,27 @@ export default {
         })
         .catch((error) => {
           console.error("Error fetching users:", error); // Log dell'errore per il debug
-          this.$toast.error('Errore:', error);
+          // Aggiungi toast in caso di errore durante il recupero degli utenti
+          this.$toast.error('Errore nel recupero degli utenti');
           this.loading = false; // Assicurati che loading sia false anche in caso di errore
         });
     },
     deleteUser(userEmail) {
       this.dialogDelete = false; // Chiudi il dialogo
       // Esegui la richiesta di eliminazione
-      axios.delete('/admin/users/delete', {
+      const urlApiUserDelete = process.env.VUE_APP_ADMIN_USERS_DELETE //variabile globale da .env
+      axios.delete(urlApiUserDelete, {
         data: { email: userEmail } // Passa l'email nel body della richiesta
       })
         .then((response) => {
           if (response.status === 200) {
-            this.$toast.success("Utente eliminato");
+            // Aggiungi toast per il successo
+            this.$toast.success("Utente eliminato con successo");
             this.users = this.users.filter(user => user.email !== userEmail);
           }
         })
         .catch((error) => {
+          // Aggiungi toast in caso di errore
           this.$toast.error('Errore durante l\'eliminazione dell\'utente');
           console.error("Errore durante l'eliminazione:", error); // Log per il debug
         });
@@ -99,7 +104,7 @@ export default {
       this.dialogDelete = true;
     },
     addUser(user) {
-      this.$toast.success("Utente aggiunto");
+      // Aggiungi toast per il successo
       this.users.push(user); // Aggiungi il nuovo utente alla lista
       setTimeout(() => {
         this.getUsersList(); // Ricarica gli utenti
