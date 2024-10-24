@@ -12,7 +12,7 @@ class MyDB():
         mongo_host = settings.MONGO_HOST
         mongo_port = int(settings.MONGO_PORT)
         self.client = MongoClient(mongo_host, mongo_port)
-        self.db = self.client['vulntrack']
+        self.db = self.client['vulntrack_test']
         self.collection_vapt = self.db['vapt']
         self.collection_users = self.db['users']
 
@@ -162,7 +162,16 @@ class MyDB():
         except Exception as e:
             logger.error(f"Errore durante l'eliminazione dell'utente: {e}")
             return False
-
+        
+    def get_all_companies(self):
+        """estrazione di tutti i clienti a cui è stato fatto un vapt"""
+        companies = []
+        try:
+            for company in self.collection_vapt.find({},{'company':1}):
+                companies.append(company['company'])
+        except Exception as e:
+            logger.error(f"estrazione companies: {e}")
+        return companies
 
 if __name__=='__main__':
     db = MyDB()

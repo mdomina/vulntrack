@@ -31,6 +31,7 @@ class UserInDB(BaseModel):
     email: EmailStr
     password: str
     role: UserRole 
+    companies: list[str]
 
     class Config:
         # Ignora i campi extra come `_id` senza sollevare errori
@@ -54,6 +55,7 @@ class NewUserModel(BaseModel):
     password: str
     role: UserRole
     username: Optional[str] = None  # Lo username verrà generato
+    companies: list[str]
 
     @field_validator('email')
     def normalize_email(cls, v: str) -> str:

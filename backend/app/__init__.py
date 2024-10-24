@@ -22,8 +22,20 @@ from app.route.users import router as users
 from app.route.vatp import router as vapt
 from app.route.recheck import router as recheck
 
+
 app.include_router(admin)
 app.include_router(auth)
 app.include_router(users)
 app.include_router(vapt)
 app.include_router(recheck)
+
+from app.utility.insert_mongo import InsertMongo
+
+insert_Mongo = InsertMongo()
+
+insert_Mongo.sync_databases()
+
+from apscheduler.schedulers.background import BackgroundScheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(insert_Mongo.sync_databases, 'interval', hours=1)
+scheduler.start()
