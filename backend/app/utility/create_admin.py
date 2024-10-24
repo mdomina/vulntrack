@@ -18,6 +18,7 @@ def create_admin_if_not_exists():
             "role": "admin",
             "email":"admin@admin.it",
             "name": "admin",
-            "surname":"admin"
+            "surname":"admin",
+            "companies":[] # quale cliente può vedere 
         }
         users.insert_one(admin_user)
