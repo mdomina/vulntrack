@@ -10,93 +10,61 @@
               <v-icon>mdi-plus</v-icon>
             </v-btn>
           </v-card-title>
-          <v-data-table :headers="headers" :items="users" item-key="email" class="elevation-1" :loading="loading">
-            <!-- bottone per eliminare l'utente -->
-            <template v-slot:item.actions="{ item }">
-              <v-btn @click="openDeleteDialog(item.email)" color="red">
-                <v-icon color="white">mdi-delete</v-icon>
-              </v-btn>
-            </template>
-          </v-data-table>
+          <user-table :users="users" @delete-user="openDeleteDialog" />
         </v-card>
       </v-col>
     </v-row>
-    <!-- aggiungi utente -->
     <add-user-dialog :dialog.sync="showDialog" @add-user="addUser" />
-    <!-- elimina utente dialog -->
-    <v-dialog v-model="dialogDelete" persistent max-width="500px">
-      <v-card>
-        <v-card-title class="text-h5">Conferma eliminazione</v-card-title>
-        <v-card-text>Sei sicuro di voler eliminare questo utente?</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialogDelete = false">Annulla</v-btn>
-          <v-btn color="red darken-1" text @click="deleteUser(currentUserToDelete)">Elimina</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <delete-confirmation-dialog
+      :dialog.sync="dialogDelete"
+      :user-to-delete="currentUserToDelete"
+      @confirm-delete="deleteUser"
+    />
   </v-container>
 </template>
 
 <script>
-import axios from 'axios'; // Importa Axios
+import axios from 'axios';
 import AddUserDialog from '@/components/AddUserDialog.vue';
+import UserTable from '@/components/UserTable.vue';
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog.vue';
 
 export default {
   components: {
     AddUserDialog,
+    UserTable,
+    DeleteConfirmationDialog,
   },
   data() {
     return {
-      headers: [
-        { text: 'Email', value: 'email', align: 'center' },
-        { text: 'Name', value: 'name', align: 'center' },
-        { text: 'Username', value: 'username', align: 'center' },
-        { text: 'Role', value: 'role', align: 'center' },
-        { text: 'Actions', value: 'actions', align: 'center', sortable: false }, // Aggiungi colonna per le azioni
-      ],
-      users: [], // Array per memorizzare i dati degli utenti
-      showDialog: false, // Stato per mostrare il dialog 
-      loading: true, // Stato di caricamento
+      users: [],
+      showDialog: false,
       dialogDelete: false,
       currentUserToDelete: null,
     };
   },
   methods: {
     getUsersList() {
-      this.loading = true;
-      const urlApiUserList = process.env.VUE_APP_ADMIN_USERS_LIST //variabile globale da .env
+      const urlApiUserList = process.env.VUE_APP_ADMIN_USERS_LIST;
       axios.get(urlApiUserList)
         .then((response) => {
-          console.log("Response data:", response.data); // Log the response data
-          this.users = response.data || []; // Assicurati che sia corretto in base alla tua risposta
-          this.loading = false; // Imposta loading su false dopo il recupero dei dati
+          this.users = response.data || [];
         })
-        .catch((error) => {
-          console.error("Error fetching users:", error); // Log dell'errore per il debug
-          // Aggiungi toast in caso di errore durante il recupero degli utenti
+        .catch(() => {
           this.$toast.error('Errore nel recupero degli utenti');
-          this.loading = false; // Assicurati che loading sia false anche in caso di errore
         });
     },
     deleteUser(userEmail) {
-      this.dialogDelete = false; // Chiudi il dialogo
-      // Esegui la richiesta di eliminazione
-      const urlApiUserDelete = process.env.VUE_APP_ADMIN_USERS_DELETE //variabile globale da .env
+      const urlApiUserDelete = process.env.VUE_APP_ADMIN_USERS_DELETE;
       axios.delete(urlApiUserDelete, {
-        data: { email: userEmail } // Passa l'email nel body della richiesta
+        data: { email: userEmail }
       })
-        .then((response) => {
-          if (response.status === 200) {
-            // Aggiungi toast per il successo
-            this.$toast.success("Utente eliminato con successo");
-            this.users = this.users.filter(user => user.email !== userEmail);
-          }
+        .then(() => {
+          this.$toast.success("Utente eliminato con successo");
+          this.users = this.users.filter(user => user.email !== userEmail);
         })
-        .catch((error) => {
-          // Aggiungi toast in caso di errore
-          this.$toast.error('Errore durante l\'eliminazione dell\'utente');
-          console.error("Errore durante l'eliminazione:", error); // Log per il debug
+        .catch(() => {
+          this.$toast.error("Errore durante l'eliminazione dell'utente");
         });
     },
     openDeleteDialog(userEmail) {
@@ -104,19 +72,12 @@ export default {
       this.dialogDelete = true;
     },
     addUser(user) {
-      // Aggiungi toast per il successo
-      this.users.push(user); // Aggiungi il nuovo utente alla lista
-      setTimeout(() => {
-        this.getUsersList(); // Ricarica gli utenti
-      }, 1500);
-    },
+      this.users.push(user);
+      this.getUsersList();
+    }
   },
   mounted() {
-    this.getUsersList(); // Carica i dati al momento del montaggio del componente
+    this.getUsersList();
   },
 };
 </script>
-
-<style scoped>
-/* Aggiungi stili personalizzati se necessario */
-</style>
