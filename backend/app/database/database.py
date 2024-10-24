@@ -172,6 +172,16 @@ class MyDB():
         except Exception as e:
             logger.error(f"estrazione companies: {e}")
         return companies
+    
+    def get_filtered_companies(self, user_companies: list[str]):
+        """estrazione dei i clienti a cui è stato fatto un vapt in base ai permessi degli utenti"""
+        companies = []
+        try:
+            for company in self.collection_vapt.find({'company': {'$in': user_companies}},{'company':1,'_id':0}):
+                companies.append(company['company'])
+        except Exception as e:
+            logger.error(f"estrazione companies: {e}")
+        return companies
 
 if __name__=='__main__':
     db = MyDB()
