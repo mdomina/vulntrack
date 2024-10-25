@@ -65,9 +65,9 @@ export default {
         ...mapActions(
              ['checkAuth']
         ),
-        showDoc(item){
-            let url = '/dashboard/recheck/' + item.nome
-            this.$router.push(url)
+        showDoc(item) {
+            let url = `/dashboard/recheck/${item.nome}/${item.cliente}`;
+            this.$router.push(url);
         }
     },
     beforMount(){

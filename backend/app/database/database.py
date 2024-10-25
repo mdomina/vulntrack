@@ -112,8 +112,8 @@ class MyDB():
         """estrae i nomi degli audits in base alla company"""
         try:
             list_name = []
-            for audit in self.collection_vapt.find({'company': company},{'company':1}):
-                list_name.append(audit['company'])
+            for audit in self.collection_vapt.find({'company': company},{'name':1}):
+                list_name.append(audit['name'])
                 list_name.sort(key=str.lower)
             return list_name
         except Exception as e:

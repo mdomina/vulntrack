@@ -65,13 +65,13 @@ export default {
       .catch(err => console.error('Errore nel recupero delle companies:', err));
     },
     getNameApps(selectedCompany) {
-      if (!selectedCompany) return;  // Verifica che sia selezionato un ente /names/appbyComany
-      const urlBackend = `${process.env.VUE_APP_VAPT_NAMES_APP_BY_COMP}/${selectedCompany}`; //<--- MODIFICARE CON LA NUOVA API!!!
-      axios.get(urlBackend)
-      .then(res => {
-        this.appNames = res.data;
+  if (!selectedCompany) return;  // Verifica che sia selezionato un ente
+  const urlBackend = process.env.VUE_APP_VAPT_NAMES_APP;
+  axios.post(urlBackend, { company_name: selectedCompany })
+    .then(res => {
+      this.appNames = res.data;
       })
-      .catch(err => console.error('Errore nel recupero delle app:', err));
+    .catch(err => console.error('Errore nel recupero delle app:', err));
     },
     filteredData() {
       const data = { nome: this.nomeApp, type: this.typeApp, company: this.selectedCompany };
