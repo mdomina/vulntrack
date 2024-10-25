@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import os
+import squarify
 
 from datetime import datetime
 graph_dir = 'grafici'
@@ -13,13 +14,20 @@ class DrawGraphs:
     def __init__(self):
         pass
 
-    # Funzione per creare il grafico a barre delle vulnerabilità per nome
-    def create_bar_chart_by_name(self, labels, sizes, output_filename):
-        fig, ax = plt.subplots()
-        ax.bar(labels, sizes, color='skyblue')
-        ax.set_ylabel('Numero di Vulnerabilità')
-        plt.xticks(rotation=45, ha='right')
+    # Funzione per creare un grafico a barre orizzontali
+    def create_horizontal_bar_chart_name(self, labels, sizes, output_filename):
+        fig, ax = plt.subplots(figsize=(10, 8))  # Aumenta la dimensione della figura
+
+        # Creazione del grafico a barre orizzontali
+        ax.barh(labels, sizes, color='skyblue', height=0.5)  # Riduci l'altezza delle barre
+        ax.set_xlabel('Numero di Vulnerabilità')
+        ax.set_ylabel('Nome Vulnerabilità')
+        ax.tick_params(axis='y', labelsize=8)  # Imposta la dimensione del font per l'asse Y
+
+
         plt.tight_layout()
+
+        # Salva il file
         file = os.path.join(graph_dir, output_filename)
         plt.savefig(file)
         plt.close()
@@ -63,7 +71,7 @@ class DrawGraphs:
         plt.close()
 
     # Funzione per creare un grafico a barre orizzontali impilate
-    def create_horizontal_bar_chart(self, categories, critical, high, medium, low, output_filename):
+    def create_horizontal_bar_chart_months(self, categories, critical, high, medium, low, output_filename):
         fig, ax = plt.subplots()
         ax.barh(categories, critical, label='Critica', color='brown')
         ax.barh(categories, high, left=critical, label='Alta', color='red')

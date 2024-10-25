@@ -1,3 +1,4 @@
+from datetime import datetime
 from docx import Document
 from docx.shared import Inches
 from DrawGraphs import DrawGraphs
@@ -5,6 +6,7 @@ from DrawGraphs import Recheck  # Importa la classe Recheck
 import os
 from pymongo import MongoClient
 from collections import Counter
+from collections import defaultdict
 
 # Inizializza la classe DrawGraphs
 draw_graphs = DrawGraphs()
@@ -36,9 +38,51 @@ def get_data_from_mongo():
     data = list(collection.find())  # Trova tutti i documenti nella collezione
     return data
 
+mongo_data = get_data_from_mongo()
+
+def get_vuln_data_by_month():
+
+    # Dobbiamo contare le vulnerabilità per severità e mese
+    severity_counts_by_month = defaultdict(lambda: {'Critica': 0, 'Alta': 0, 'Media': 0, 'Bassa': 0})
+
+    # Mappa per associare la severità ai nomi che useremo nel grafico
+    severity_map = {
+        'Critical': 'Critica',
+        'High': 'Alta',
+        'Medium': 'Media',
+        'Low': 'Bassa'
+    }
+
+    for item in mongo_data:
+        # Estrai la data della vulnerabilità e converti il mese in formato leggibile (es. "Settembre")
+        findings = item.get('findings', [])
+        date_str = item.get('date', '')  # Assumiamo che la data sia nel formato YYYY-MM-DD
+        if date_str:
+            month_number = int(date_str.split('-')[1])  # Estrai il mese dalla data (es. '09' da '2023-09-27')
+            month_name = datetime.strptime(str(month_number), "%m").strftime("%B")  # Converte il mese in nome
+
+            # Conta le severità delle vulnerabilità nel mese corrente
+            for finding in findings:
+                severity = finding.get('severity', 'Unknown')
+                severity_name = severity_map.get(severity, 'Unknown')
+
+                if severity_name in severity_counts_by_month[month_name]:
+                    severity_counts_by_month[month_name][severity_name] += 1
+
+    # Ordiniamo i mesi in base all'ordine cronologico
+    ordered_months = sorted(severity_counts_by_month.keys(), key=lambda x: datetime.strptime(x, "%B").month)
+    
+    # Ritorniamo i mesi e i conteggi per ciascuna severità
+    months = ordered_months
+    critical_counts = [severity_counts_by_month[month]['Critica'] for month in months]
+    high_counts = [severity_counts_by_month[month]['Alta'] for month in months]
+    medium_counts = [severity_counts_by_month[month]['Media'] for month in months]
+    low_counts = [severity_counts_by_month[month]['Bassa'] for month in months]
+
+    return months, critical_counts, high_counts, medium_counts, low_counts
+
 def get_vuln_data_from_mongo():
     # Estrai tutti i documenti da MongoDB
-    mongo_data = get_data_from_mongo()
 
     # Estrai i titoli delle vulnerabilità e i tipi di vulnerabilità da tutti i documenti
     findings_titles = []
@@ -68,6 +112,7 @@ def get_vuln_data_from_mongo():
 
 name_vapt, sizes_vapt, vuln_type_names, vuln_type_sizes, severity_names, severity_sizes = get_vuln_data_from_mongo()
 
+months, critical, high, medium, low = get_vuln_data_by_month()
 
 # Funzione per sostituire i tag nel documento Word
 def replace_tag_with_chart(doc, tag, image_path, image_width=Inches(5)):
@@ -119,10 +164,10 @@ def modify_word_document_with_charts(input_doc_path, output_doc_path, mongo_data
 
 
     # Genera i grafici usando la classe DrawGraphs
-    draw_graphs.create_bar_chart_by_name(name_vapt, sizes_vapt, 'bar_chart_by_name.png')
+    draw_graphs.create_horizontal_bar_chart_name(name_vapt, sizes_vapt, 'horizontal_bar_chart_by_name.png')
     draw_graphs.create_timeline_chart(['2023-09-28', '2023-10-16', '2023-11-03', '2023-11-21', '2023-12-09'], [8, 1, 1, 1, 1], [4, 5, 6, 2, 1], [12, 10, 7, 9, 8], [8, 4, 2, 8, 2], 'timeline_chart.png')
     draw_graphs.create_pie_chart(['Critica', 'Alta', 'Media', 'Bassa'], [8, 21, 164, 88], ['brown', 'red', 'orange', 'green'], 'pie_chart.png')
-    draw_graphs.create_horizontal_bar_chart(['Settembre', 'Ottobre', 'Novembre', 'Dicembre'], [8, 3, 3, 5], [12, 6, 6, 12], [12, 35, 47, 74], [12, 67, 79, 123], 'horizontal_bar_chart.png')
+    draw_graphs.create_horizontal_bar_chart_months(months, critical, high, medium, low, 'horizontal_bar_chart.png')
     draw_graphs.create_all_donut_charts(donut_data, 'donut_charts.png')
     draw_graphs.create_bar_chart_by_category(vuln_type_names,vuln_type_sizes, 'bar_chart_by_category.png')
 
@@ -136,7 +181,7 @@ def modify_word_document_with_charts(input_doc_path, output_doc_path, mongo_data
     replace_tag_with_chart(doc, '{{tag_graficotimeline}}', os.path.join(graph_dir, 'timeline_chart.png'))
     replace_tag_with_chart(doc, '{{tag_complessive}}', os.path.join(graph_dir, 'pie_chart.png'))
     replace_tag_with_chart(doc, '{{tag_mensili}}', os.path.join(graph_dir, 'horizontal_bar_chart.png'))
-    replace_tag_with_chart(doc, '{{tag_name}}', os.path.join(graph_dir, 'bar_chart_by_name.png'))
+    replace_tag_with_chart(doc, '{{tag_name}}', os.path.join(graph_dir, 'horizontal_bar_chart_by_name.png'))
     replace_tag_with_chart(doc, '{{tag_categoria}}', os.path.join(graph_dir, 'bar_chart_by_category.png'))
 
     # Sostituisci il grafico di riepilogo Recheck
