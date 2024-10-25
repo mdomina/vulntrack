@@ -41,39 +41,44 @@ export default {
     methods: {
         formatRemediationData() {
             let remediationsData = [];
+            
             this.dataRemediation.forEach(item => {
-                item.data.forEach(entry => {
+                item.findings.forEach(entry => {
                     let remediation = {
-                        nome: item.nome,
-                        type: item.type,
-                        codice_elettra: item.codice_elettra,
-                        vulnerabilita: entry['vulnerabilità'],
-                        anno: item.anno,
-                        mese: item.mese,
-                        descrizione: entry.descrizione,
-                        owner: entry.owner,
-                        gravita: entry['gravità'],
-                        cliente: item.cliente
+                        nome: item.name,  // Cambiato da 'nome' a 'name'
+                        type: item.auditType,  // Cambiato da 'type' a 'auditType'
+                        codice_elettra: "-",  // Codice elettra non esiste in new_data, puoi mantenerlo se necessario
+                        vulnerabilita: entry.title,  // Cambiato da 'vulnerabilità' a 'title'
+                        anno: new Date(item.date).getFullYear(),  // Estrai l'anno dalla data
+                        mese: new Date(item.date).toLocaleString('it-IT', { month: 'long' }),  // Estrai il mese dalla data
+                        descrizione: entry.vulnType,  // Non c'è 'descrizione' diretta, uso 'vulnType'
+                        owner: item.company,  // 'owner' è il cliente, quindi usa 'company'
+                        gravita: entry.severity,  // Cambiato da 'gravità' a 'severity'
+                        cliente: item.company  // 'cliente' è 'company'
                     };
                     remediationsData.push(remediation);
                 });
             });
+
             this.remediations = remediationsData;
         },
-        colorChips(gravita){
-            if (gravita == 'critica'){
-                return '#8B0000'
-            }
-            else if (gravita == 'alta'){
-                return '#FF0000'
-            }
-            else if (gravita == 'media'){
-                return '#ff7f0e'
-            }
+        colorChips(gravita) {
+            gravita = gravita.toLowerCase();  // Trasforma 'gravita' in minuscolo
+
+            if (gravita === 'critical') {
+                return '#8B0000';  // Rosso scuro per 'critica'
+            } 
+            else if (gravita === 'high') {
+                return '#FF0000';  // Rosso per 'alta'
+            } 
+            else if (gravita === 'medium') {
+                return '#ff7f0e';  // Arancione per 'media'
+            } 
             else {
-                return '#2ca02c'
+                return '#2ca02c';  // Verde per altre gravità (presumibilmente 'bassa')
             }
         }
+
     },
     watch: {
         dataRemediation: {

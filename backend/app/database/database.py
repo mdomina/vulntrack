@@ -75,35 +75,10 @@ class MyDB():
             logger.error(f"ricerca filtrata: {e}")
             return None
     
-    def get_all_audits(self):
-        """ritorna tutti gli audit"""
-        try:
-            remediations = []
-            for value in self.collection_vapt.find():
-                del value['_id']
-                remediations.append(value)
-            return remediations
-        except Exception as e:
-            logger.error(f"ricerca totale: {e}")
-            return None
     
     def remediations_list(self):
         try:
-            remediations = []
-            for remediation in self.collection_vapt.find():
-                # Rimuove il campo 'findings' per evitare di includere dati non necessari
-                # del remediation['findings']
-                
-                value = {
-                    "id": str(remediation['_id']),
-                    "anno": remediation.get('date', '')[:4],  # Anno estratto dalla data
-                    "mese": remediation.get('date', '')[5:7],  # Mese estratto dalla data
-                    "nome": remediation.get('name', ''),
-                    "type": remediation.get('auditType', ''),
-                    "codice_elettra": ('-'),  # Default '-' se non presente
-                    "cliente": remediation.get('company', '')
-                }
-                remediations.append(value)
+            
             return remediations
         except Exception as e:
             logger.error(f"estrazione remediation list: {e}")

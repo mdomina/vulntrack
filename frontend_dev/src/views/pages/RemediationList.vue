@@ -19,7 +19,7 @@ export default {
     }),
     methods: {
         getDataRemediation() {
-            const urlBackend = process.env.VUE_APP_VAPT_DATA;
+            const urlBackend = process.env.VUE_APP_VAPT_DATA_DASHBOARD;
             axios.get(urlBackend).then(res => {
                 this.dataRemediation = res.data
             })

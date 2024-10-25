@@ -28,20 +28,6 @@ async def vapt_list_name(current_user: Annotated[UserInDB, Depends(get_current_u
             detail="Errore estrazione lista remediations",
         )
 
-@router.get("/data")
-async def audits_data(current_user: Annotated[UserInDB, Depends(get_current_user)]):
-    """Endpoint per avere tutti gli audits"""
-    try:
-        remediation = mydb.get_all_audits()
-        mapping = MappingVulnerability()
-        data = mapping.format_vulerabiliy_name(remediation)
-        return data
-    except:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Errore estrazione lista remediations",
-        )
-
 @router.post("/names/app")
 async def list_names_app(current_user: Annotated[UserInDB, Depends(get_current_user)],  company_input: InputCompanyName):
     """Endpoint per avere i nomi di tutte le app testate"""

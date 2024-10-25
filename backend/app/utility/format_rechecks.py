@@ -12,9 +12,9 @@ def filter_rechecks(input_data):
             seen[key] = entry
 
         # Aggiorna i flag 'vapt' e 'recheck' in base al 'type' corrente.
-        if entry["type"] == "recheck":
+        if entry["type"] == "Recheck":
             seen[key]["recheck"] = True
-        elif entry["type"] == "vapt":
+        elif entry["type"] != "Recheck":
             seen[key]["vapt"] = True
 
     # Ora che abbiamo processato tutti i dati, rimuoviamo il campo 'type' e ritorniamo solo i valori del dizionario 'seen' come lista.
