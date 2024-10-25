@@ -76,21 +76,32 @@ class DrawGraphs:
         plt.savefig(file)
         plt.close()
 
-    # Funzione per creare un singolo grafico a ciambella per una categoria senza spazio bianco
     def create_donut_chart(self, value, label, color, output_filename):
         fig, ax = plt.subplots()
-        ax.pie([value, 0], labels=[label, ''], startangle=90, colors=[color, 'lightgrey'], 
+
+        # Calcola il resto per completare la ciambella (se il totale è il valore passato)
+        total = value if value > 0 else 1  # Imposta un minimo di 1 per evitare valori negativi o zero
+        remainder = total - value
+
+        # Usa il valore effettivo per il wedge (ciambella) e il resto per riempire lo spazio
+        ax.pie([value, remainder], labels=[label, ''], startangle=90, colors=[color, 'lightgrey'], 
             wedgeprops={'width': 0.3, 'edgecolor': 'white'}, 
             textprops={'fontsize': 20, 'color': 'black'})
+
+        # Aggiungi il numero al centro della ciambella
         ax.text(0, 0, str(value), ha='center', va='center', fontsize=24, color=color)
         ax.axis('equal')
+
+        # Salva il grafico
         plt.savefig(os.path.join(graph_dir, output_filename), transparent=True)
         plt.close()
 
-    # Creazione di 4 grafici a ciambella senza spazi bianchi
+
+    # Funzione per creare tutti i grafici a ciambella
     def create_all_donut_charts(self, data, output_filenames):
         for value, label, color, filename in data:
             self.create_donut_chart(value, label, color, filename)
+
 
     # Funzione per creare un grafico a barre
     def create_bar_chart(self, categories, critical, high, medium, low, output_filename):

@@ -226,10 +226,10 @@ def replace_tag_with_donut_charts(doc, tag):
             table = doc.add_table(rows=1, cols=4)
 
             row_cells = table.rows[0].cells
-            row_cells[0].paragraphs[0].add_run().add_picture(os.path.join(graph_dir, 'critiche.png'), width=Inches(1.5))
-            row_cells[1].paragraphs[0].add_run().add_picture(os.path.join(graph_dir, 'alte.png'), width=Inches(1.5))
-            row_cells[2].paragraphs[0].add_run().add_picture(os.path.join(graph_dir, 'medie.png'), width=Inches(1.5))
-            row_cells[3].paragraphs[0].add_run().add_picture(os.path.join(graph_dir, 'basse.png'), width=Inches(1.5))
+            row_cells[0].paragraphs[0].add_run().add_picture(os.path.join(graph_dir, 'critical.png'), width=Inches(1.5))
+            row_cells[1].paragraphs[0].add_run().add_picture(os.path.join(graph_dir, 'high.png'), width=Inches(1.5))
+            row_cells[2].paragraphs[0].add_run().add_picture(os.path.join(graph_dir, 'medium.png'), width=Inches(1.5))
+            row_cells[3].paragraphs[0].add_run().add_picture(os.path.join(graph_dir, 'low.png'), width=Inches(1.5))
             
             paragraph._element.addnext(table._element)
 
@@ -242,18 +242,26 @@ def modify_word_document_with_charts(input_doc_path, output_doc_path):
     recheck_values = list(recheck_data.values())  # Estrai i valori
  # Crea i dati per i grafici a ciambella sulla base della severity
     severity_color_map = {
-        'Critica': 'brown',
-        'Alta': 'red',
-        'Media': 'orange',
-        'Bassa': 'green'
+        'Critical': 'brown',
+        'High': 'red',
+        'Medium': 'orange',
+        'Low': 'green'
     }
     
     donut_data = [(count, severity, severity_color_map.get(severity, 'grey'), f'{severity.lower()}.png') for severity, count in zip(severity_names, severity_sizes)]
+    # Estrai i valori di severità da vapt_data per il grafico a torta
+    severity_labels = ['Critica', 'Alta', 'Media', 'Bassa']  # Le etichette rimangono invariate
+    severity_colors = ['brown', 'red', 'orange', 'green']  # I colori per ciascuna severità
+
+    # Usa i dati dinamici da vapt_data (già calcolati sopra)
+    severity_counts_vapt = [vapt_data['Critica'], vapt_data['Alta'], vapt_data['Media'], vapt_data['Bassa']]
+
+    # Genera il grafico a torta con i dati dinamici
 
     # Genera i grafici usando la classe DrawGraphs
     draw_graphs.create_horizontal_bar_chart_name(name_vapt, sizes_vapt, 'horizontal_bar_chart_by_name.png')
     draw_graphs.create_timeline_chart(['2023-09-28', '2023-10-16', '2023-11-03', '2023-11-21', '2023-12-09'], [8, 1, 1, 1, 1], [4, 5, 6, 2, 1], [12, 10, 7, 9, 8], [8, 4, 2, 8, 2], 'timeline_chart.png')
-    draw_graphs.create_pie_chart(['Critica', 'Alta', 'Media', 'Bassa'], [8, 21, 164, 88], ['brown', 'red', 'orange', 'green'], 'pie_chart.png')
+    draw_graphs.create_pie_chart(severity_labels, severity_counts_vapt, severity_colors, 'pie_chart.png')
     draw_graphs.create_horizontal_bar_chart_months(months, critical, high, medium, low, 'horizontal_bar_chart.png')
     draw_graphs.create_all_donut_charts(donut_data, 'donut_charts.png')
     draw_graphs.create_bar_chart_by_category(vuln_type_names,vuln_type_sizes, 'bar_chart_by_category.png')
