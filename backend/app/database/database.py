@@ -75,15 +75,6 @@ class MyDB():
             logger.error(f"ricerca filtrata: {e}")
             return None
     
-    
-    def remediations_list(self):
-        try:
-            
-            return remediations
-        except Exception as e:
-            logger.error(f"estrazione remediation list: {e}")
-            return None
-    
     def audit_list_name_by_company(self, company:str) -> list:
         """estrae i nomi degli audits in base alla company"""
         try:
