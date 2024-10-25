@@ -82,61 +82,54 @@ export default {
   props: ['data'],
   methods: {
     formatData() {
-      let dataFromMongoDB = this.data; // Inserisci qui i tuoi dati
-      
-      let projects = dataFromMongoDB.map(item => ({ date: item.data[0]['ultimo aggiornamento'], name: item.nome, cliente: item.cliente }));
+    let dataFromMongoDB = this.data; // Inserisci qui i tuoi dati
+    
+    // Mappatura per ottenere le informazioni chiave dei progetti
+    let projects = dataFromMongoDB.map(item => ({ date: item.date, name: item.name, cliente: item.company }));
 
-      let dateCounts = {}; // Un oggetto per tenere traccia delle date e dei conteggi
+    let dateCounts = {}; // Oggetto per tenere traccia delle date e dei conteggi
 
-      projects.forEach(project => {
+    projects.forEach(project => {
         if (!dateCounts[project.date]) {
-          dateCounts[project.date] = dataFromMongoDB.find(item => item.nome === project.name && item.cliente === project.cliente).data;
+            dateCounts[project.date] = dataFromMongoDB.find(item => item.name === project.name && item.company === project.cliente).findings;
         } else {
-          dateCounts[project.date] = dateCounts[project.date].concat(dataFromMongoDB.find(item => item.nome === project.name && item.cliente === project.cliente).data);
+            dateCounts[project.date] = dateCounts[project.date].concat(dataFromMongoDB.find(item => item.name === project.name && item.company === project.cliente).findings);
         }
-      });
-      
-      let severities = ['Critica', 'Alta', 'Media', 'Bassa'];
+    });
+    
+    // Categorie di severità da usare nel grafico
+    let severities = ['Critical', 'High', 'Medium', 'Low'];
 
-      let chartData = severities.map(severity => {
+    let chartData = severities.map(severity => {
         let data = [];
         for (let date in dateCounts) {
-          let count = dateCounts[date].filter(entry => entry['gravità'].toLowerCase() === severity.toLowerCase()).length;
-          data.push(count);
+            let count = dateCounts[date].filter(entry => entry['severity'].toLowerCase() === severity.toLowerCase()).length;
+            data.push(count);
         }
         return { name: severity, data: data };
-      });
+    });
 
-      let categories = Object.keys(dateCounts).map(date => date + ' GMT');
+    // Creazione delle categorie (date) per l'asse x
+    let categories = Object.keys(dateCounts).map(date => date + ' GMT');
 
-      /*let xaxis = categories.length > 0
-        ? { type: 'datetime', categories: categories }
-        : { categories: categories };*/
-
-
-
-      let finalChartObject = {
+    let finalChartObject = {
         chartData: chartData,
         xaxis: { type: 'datetime', categories: categories },
-      };
+    };
 
+    this.series = finalChartObject.chartData;
 
-      this.series = finalChartObject.chartData;
-
-      // Creiamo un nuovo oggetto chartOptions. 
-      // L'operatore di spread (...) per creare una copia di chartOptions, quindi sostituisce:
-      // se categories.length > 1 allora stacked è true altrimenti è false
-      // la proprietà xaxis
-      this.chartOptions = {
+    // Configurazione delle opzioni del grafico
+    this.chartOptions = {
         ...this.chartOptions,
         chart: {
-          ...this.chartOptions.chart,
-          stacked: categories.length > 1,
+            ...this.chartOptions.chart,
+            stacked: categories.length > 1,
         },
         xaxis: finalChartObject.xaxis
-      };
+    };
+}
 
-    }
   },
   watch: {
     data: {

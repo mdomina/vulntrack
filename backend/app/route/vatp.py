@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.database.database import MyDB
 from app.model.model import InputNomeApp, InputCompanyName
-from app.model.user_model import UserInDB
+from app.model.user_model import UserInDB, UserRole
 from app.utility.mapping_vulnerability import MappingVulnerability
 from app.utility.users import get_current_user
 
@@ -29,10 +29,10 @@ async def vapt_list_name(current_user: Annotated[UserInDB, Depends(get_current_u
         )
 
 @router.get("/data")
-async def remediation_data(current_user: Annotated[UserInDB, Depends(get_current_user)]):
-    """Endpoint per avere tutti i remediation"""
+async def audits_data(current_user: Annotated[UserInDB, Depends(get_current_user)]):
+    """Endpoint per avere tutti gli audits"""
     try:
-        remediation = mydb.ricerca_all()
+        remediation = mydb.get_all_audits()
         mapping = MappingVulnerability()
         data = mapping.format_vulerabiliy_name(remediation)
         return data
@@ -58,9 +58,18 @@ async def list_names_app(current_user: Annotated[UserInDB, Depends(get_current_u
 @router.get("/data/dashboard")
 async def vapt_data(current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """Endpoint per avere la lista vapt da inserire nella dashboard"""
-    remediation = mydb.ricerca_filtrata({'type': 'vapt'})
+    if current_user.role ==  UserRole.ADMIN:
+        audits = mydb.ricerca_filtrata({
+            'auditType': {'$ne': 'Recheck'}, 
+            })
+    else:
+        audits = mydb.ricerca_filtrata({
+            'auditType': {'$ne': 'Recheck'}, 
+            'company': {'$in': current_user.companies}
+            })
     mapping = MappingVulnerability()
-    return mapping.format_vulerabiliy_name(remediation)
+    return audits
+    #return mapping.format_vulerabiliy_name(audits)
 
 @router.get("/companies/list")
 async def companies_list(current_user: Annotated[UserInDB, Depends(get_current_user)]):

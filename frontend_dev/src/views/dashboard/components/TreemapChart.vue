@@ -37,8 +37,8 @@ export default {
         formatData() {
             let vulnerabilityCount = {};
             this.dataRemediation.forEach((record) => {
-                record.data.forEach((vulnerability) => {
-                    let vulnerabilityName = vulnerability['vulnerabilità'];
+                record.findings.forEach((vulnerability) => {
+                    let vulnerabilityName = vulnerability['title'];
                     if (vulnerabilityCount[vulnerabilityName]) {
                         vulnerabilityCount[vulnerabilityName]++;
                     } else {

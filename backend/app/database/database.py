@@ -55,8 +55,7 @@ class MyDB():
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File esistente")
         except Exception as e:
             logger.error(f"inserimento database: {e}")
-
-    
+   
     def ping(self):
         try:
             self.client.admin.command('ping')
@@ -65,17 +64,19 @@ class MyDB():
             logger.error(f"ping database: {e}")
 
     def ricerca_filtrata(self, filtro):
+        """effettua una get, filtrando i risultati"""
         try:
             results = []
             # In questo caso, cerchiamo tutti i documenti dove il campo 'type' è uguale al valore passato.
-            for result in self.collection_vapt.find(filtro):
+            for result in self.collection_vapt.find(filtro,{'_id':0}):
                 results.append(result)
             return results
         except Exception as e:
             logger.error(f"ricerca filtrata: {e}")
             return None
     
-    def ricerca_all(self):
+    def get_all_audits(self):
+        """ritorna tutti gli audit"""
         try:
             remediations = []
             for value in self.collection_vapt.find():

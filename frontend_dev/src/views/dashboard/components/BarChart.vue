@@ -85,48 +85,53 @@ export default {
     props: ['dataRemediation'],
     methods: {
         formatData() {
-            let countData = {
-                'Critica': {},
-                'Alta': {},
-                'Media': {},
-                'Bassa': {},
-            };
+    let countData = {
+        'critical': {},
+        'high': {},
+        'medium': {},
+        'low': {},
+    };
 
-            // Calcolo dei conteggi delle vulnerabilità per mese e gravità
-            this.dataRemediation.forEach(item => {
-                let month = item.mese;
+    // Calcolo dei conteggi delle vulnerabilità per mese e severità
+    this.dataRemediation.forEach(item => {
+        if (!item.findings) return;  // Salta se findings è undefined
 
-                item.data.forEach(entry => {
-                    let gravity = entry['gravità'].charAt(0).toUpperCase() + entry['gravità'].slice(1); // Conversione della gravità in formato appropriato
-                    if (!(month in countData[gravity])) {
-                        countData[gravity][month] = 0;
-                    }
-                    countData[gravity][month]++;
-                });
-            });
+        // Estrai il mese dal campo 'date'
+        let month = new Date(item.date).toLocaleString('it-IT', { month: 'long' });
 
-            // Creazione di un elenco univoco di mesi (categorie asse x)
-            let uniqueMonths = [...new Set([].concat(...Object.values(countData).map(Object.keys)))];
+        item.findings.forEach(entry => {
+            let severity = entry['severity'] ? entry['severity'].toLowerCase() : null; // Verifica che severity esista
+            if (!severity || !(severity in countData)) return; // Salta se severity è undefined o non è una chiave valida
 
-            // Ordinamento dei mesi in ordine temporale
-            const monthNames = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
-            uniqueMonths.sort((a, b) => monthNames.indexOf(a) - monthNames.indexOf(b));
+            if (!(month in countData[severity])) {
+                countData[severity][month] = 0;
+            }
+            countData[severity][month]++;
+        });
+    });
 
-            // Creazione di dati di serie
-            let series = Object.entries(countData).map(([gravity, counts]) => {
-                return {
-                    name: gravity,
-                    data: uniqueMonths.map(month => counts[month] || 0)
-                };
-            });
+    // Creazione di un elenco univoco di mesi (categorie asse x)
+    let uniqueMonths = [...new Set([].concat(...Object.values(countData).map(Object.keys)))];
 
-            // Assegnazione dei risultati alle variabili appropriate
-            this.series = series;
-            this.chartOptions = {
-                ...this.chartOptions,
-                xaxis: { categories: uniqueMonths }
-            };
-        }
+    // Ordinamento dei mesi in ordine temporale
+    const monthNames = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+    uniqueMonths.sort((a, b) => monthNames.indexOf(a) - monthNames.indexOf(b));
+
+    // Creazione di dati di serie
+    let series = Object.entries(countData).map(([severity, counts]) => {
+        return {
+            name: severity.charAt(0).toUpperCase() + severity.slice(1), // Capitalizza la severità per la leggibilità
+            data: uniqueMonths.map(month => counts[month] || 0)
+        };
+    });
+
+    // Assegnazione dei risultati alle variabili appropriate
+    this.series = series;
+    this.chartOptions = {
+        ...this.chartOptions,
+        xaxis: { categories: uniqueMonths }
+    };
+}
 
 
     },

@@ -80,15 +80,15 @@ export default {
       // Itera su ogni elemento in dataRemediation
       this.dataRemediation.forEach(item => {
         // Itera su ogni elemento nella lista "data" dell'elemento corrente
-        item.data.forEach(entry => {
-          // Se l'elemento ha una proprietà 'categoria'
-          if (entry['categoria']) {
-            // Se non abbiamo ancora visto questa categoria, aggiungila all'oggetto 'tipologies' con un conteggio di 1
-            if (!tipologies[entry['categoria']]) {
-              tipologies[entry['categoria']] = 1;
+        item.findings.forEach(entry => {
+          // Se l'elemento ha una proprietà 'vulnType'
+          if (entry['vulnType']) {
+            // Se non abbiamo ancora visto questa vulnType, aggiungila all'oggetto 'tipologies' con un conteggio di 1
+            if (!tipologies[entry['vulnType']]) {
+              tipologies[entry['vulnType']] = 1;
             } else {
-              // Altrimenti, abbiamo già visto questa categoria, quindi aumentiamo il conteggio di 1
-              tipologies[entry['categoria']]++;
+              // Altrimenti, abbiamo già visto questa vulnType, quindi aumentiamo il conteggio di 1
+              tipologies[entry['vulnType']]++;
             }
           }
         });
@@ -97,23 +97,23 @@ export default {
       let seriesData = []; // Crea un array vuoto per memorizzare i dati della serie
       let categories = []; // Crea un array vuoto per memorizzare le categorie
 
-      // Itera su ogni categoria in 'tipologies'
+      // Itera su ogni vulnType in 'tipologies'
       for (let tipology in tipologies) {
-        // Aggiungi il conteggio della categoria ai dati della serie
+        // Aggiungi il conteggio della vulnType ai dati della serie
         seriesData.push(tipologies[tipology]);
-        // Aggiungi il nome della categoria alle categorie
+        // Aggiungi il nome della vulnType alle categorie
         categories.push(tipology);
       }
 
       // Se ci sono meno di 5 categorie
       let index_fisse = 0;
       while (categories.length < 5 && index_fisse < categorie_fisse.length) {
-        let categoria = categorie_fisse[index_fisse];
+        let vulnType = categorie_fisse[index_fisse];
         // Evita di aggiungere categorie duplicate
-        if (!categories.includes(categoria)) {
-          // Aggiungi la categoria fissa alle categorie
-          categories.push(categoria);
-          // Aggiungi un conteggio di 0 ai dati della serie per questa categoria
+        if (!categories.includes(vulnType)) {
+          // Aggiungi la vulnType fissa alle categorie
+          categories.push(vulnType);
+          // Aggiungi un conteggio di 0 ai dati della serie per questa vulnType
           seriesData.push(0);
         }
         index_fisse++;

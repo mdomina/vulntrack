@@ -68,14 +68,14 @@ export default {
     props: ['dataRemediation'],
     methods: {
         countVulnerabilities() {
-            const severities = ['critica'];
+            const severities = ['Critical'];  // Modifica la severità come desiderato
             let counts = [];
 
             severities.forEach(severity => {
-                let count = 1;
+                let count = 0;
 
                 this.dataRemediation.forEach(item => {
-                    count += item.data.filter(entry => entry['gravità'].toLowerCase() === severity).length;
+                    count += item.findings.filter(entry => entry['severity'].toLowerCase() === severity.toLowerCase()).length;
                 });
 
                 counts.push(count);
