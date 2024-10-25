@@ -1,9 +1,13 @@
 <template>
+  <!-- Dialog per aggiungere un nuovo utente -->
   <v-dialog v-model="dialog" max-width="500px">
     <v-card>
+      <!-- Titolo del dialog -->
       <v-card-title>
         <span class="headline">Aggiungi Utente</span>
       </v-card-title>
+      
+      <!-- Sottotitolo con il form -->
       <v-card-subtitle>
         <v-form ref="form" v-model="valid">
           <!-- Campo per l'email dell'utente -->
@@ -23,11 +27,14 @@
           <v-select v-model="user.role" :items="roles" label="Ruolo" required :rules="[roleRule]" item-text="name"
             item-value="value" />
           
-          <!-- Selettore per l'ente dell'utente -->
-          <!-- <v-select v-model="user.ente" :items="enti" label="Ente" required
-            :rules="[v => !!v || 'Seleziona un ente']" item-text="name" item-value="id" /> -->
+          <!-- Selettore per l'ente dell'utente (con supporto per selezione multipla) -->
+          <v-select v-model="user.ente" :items="enti" label="Ente" required
+            :rules="[v => !!v || 'Seleziona almeno un ente']" item-text="name" item-value="id" multiple />
+          <!-- `multiple` permette all'utente di selezionare più enti -->
         </v-form>
       </v-card-subtitle>
+
+      <!-- Azioni del dialog -->
       <v-card-actions>
         <v-spacer></v-spacer>
         <!-- Pulsante per annullare l'operazione -->
@@ -54,23 +61,18 @@ export default {
       valid: false, // Stato di validazione del modulo
       showPassword: false, // Stato per mostrare/nascondere la password
       user: {
-        email: '',
-        name: '',
-        surname: '',
-        password: '',
-        role: ''
-        //ente: '' // Campo per memorizzare l'ente selezionato
+        email: '',   // Email dell'utente
+        name: '',    // Nome dell'utente
+        surname: '', // Cognome dell'utente
+        password: '',// Password dell'utente
+        role: '',    // Ruolo dell'utente (admin/user)
+        ente: []     // Lista di enti selezionati dall'utente (inizialmente vuota)
       },
       roles: [ // Opzioni per il selettore dei ruoli
         { value: 'admin', name: 'Admin' },
         { value: 'user', name: 'User' }
       ],
-      // enti: [ // Elenco degli enti (città lombarde)
-      //   { id: 1, name: 'Milano' },
-      //   { id: 2, name: 'Bergamo' },
-      //   { id: 3, name: 'Brescia' },
-      //   { id: 4, name: 'Como' }
-      // ],
+      enti: [], // Elenco degli enti ottenuti dall'API
       // Regole per la validazione dei campi
       emailRules: [
         v => !!v || 'Email è richiesta',
@@ -90,23 +92,38 @@ export default {
     };
   },
   mounted() {
-    // Qui non è necessario chiamare getEnti poiché gli enti sono già definiti staticamente.
+    this.getEnti(); // Recupera l'elenco degli enti al montaggio del componente
   },
   methods: {
+    // Funzione per recuperare l'elenco degli enti dall'API
+    getEnti() {
+      const urlApiEnti = '/admin/companies/list'; // URL API per ottenere la lista degli enti
+      axios.get(urlApiEnti)
+        .then((response) => {
+          this.enti = response.data; // Salva la lista degli enti nella variabile enti
+        })
+        .catch(() => {
+          this.$toast.error('Errore nel recupero degli enti'); // Notifica errore in caso di fallimento
+        });
+    },
+    
+    // Funzione per chiudere il dialog
     close() {
       this.$emit('update:dialog', false); // Chiudi il dialog e aggiorna lo stato nel componente genitore
     },
+
+    // Funzione per inviare i dati dell'utente tramite API
     submit() {
       // Controlla se il modulo è valido
       if (this.$refs.form.validate()) {
-        const urlApiUserAdd = process.env.VUE_APP_ADMIN_USERS_ADD //variabile da .env
+        const urlApiUserAdd = process.env.VUE_APP_ADMIN_USERS_ADD; // Variabile da .env per URL API
         axios.post(urlApiUserAdd, {
           email: this.user.email,
           name: this.user.name,
           surname: this.user.surname,
           password: this.user.password,
           role: this.user.role,
-          //ente: this.user.ente // Includi l'ente nella richiesta se necessario
+          companies: Array.isArray(this.user.ente) ? this.user.ente : [this.user.ente] // Assicurati che sia un array di stringhe
         })
         .then((response) => {
           if (response.status === 200) {
@@ -132,18 +149,22 @@ export default {
         this.$toast.error("Per favore, completa il modulo correttamente."); // Messaggio di errore per validazione fallita
       }
     },
+    
+    // Funzione per alternare la visibilità della password
     toggleShowPassword() {
       this.showPassword = !this.showPassword; // Alterna la visibilità della password
     },
+
+    // Funzione per resettare i campi del modulo
     resetForm() {
-      // Resetta i campi del modulo
+      // Resetta i campi del modulo dopo che l'utente è stato aggiunto
       this.user = {
         email: '',
         name: '',
         surname: '',
         password: '',
         role: '',
-        //ente: '' // Resetta il campo ente
+        companies: [] // Assicurati che ente venga resettato come array vuoto
       };
     }
   }

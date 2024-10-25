@@ -57,6 +57,7 @@ export default new Router({
                     component: () => import('@/views/dashboard/Dashboard'),
                 },
                 {
+                    //questa qua da fare il tasto filtro
                     name: 'Recheck',
                     path: 'dashboard/recheck/:nomeApp',
                     props: true,

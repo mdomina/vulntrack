@@ -56,6 +56,7 @@ export default {
   methods: {
     getNameApps() {
       const urlBackend = process.env.VUE_APP_VAPT_NAMES_APP;
+      //urlcomposta = urlBackend+nometente
       axios.get(urlBackend).then(res => {
         this.items = res.data
       })
