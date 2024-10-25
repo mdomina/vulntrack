@@ -59,3 +59,11 @@ async def vapt_data(current_user: Annotated[UserInDB, Depends(get_current_user)]
     remediation = mydb.ricerca_filtrata({'type': 'vapt'})
     mapping = MappingVulnerability()
     return mapping.format_vulerabiliy_name(remediation)
+
+@router.get("/companies/list")
+async def companies_list(current_user: Annotated[UserInDB, Depends(get_current_user)]):
+    """Endpoint per avere la lista delle società in base all'utente"""
+    
+    mydb = MyDB()
+    companies = mydb.get_filtered_companies(current_user.companies)
+    return companies
