@@ -14,3 +14,6 @@ class LoginData(BaseModel):
 class InputNomeApp(BaseModel):
     nome: str
     type: str
+
+class InputCompanyName(BaseModel):
+    company_name:str
