@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.database.database import MyDB
-from app.model.model import InputNomeApp
+from app.model.model import InputNomeApp, InputCompanyName
 from app.model.user_model import UserInDB
 from app.utility.mapping_vulnerability import MappingVulnerability
 from app.utility.users import get_current_user
@@ -42,11 +42,13 @@ async def remediation_data(current_user: Annotated[UserInDB, Depends(get_current
             detail="Errore estrazione lista remediations",
         )
 
-@router.get("/names/app")
-async def list_names_app(current_user: Annotated[UserInDB, Depends(get_current_user)]):
+@router.post("/names/app")
+async def list_names_app(current_user: Annotated[UserInDB, Depends(get_current_user)],  company_input: InputCompanyName):
     """Endpoint per avere i nomi di tutte le app testate"""
+    if company_input.company_name not in current_user.companies:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     try:
-        return mydb.remediation_list_name()
+        return mydb.audit_list_name_by_company(company_input.company_name)
     except:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

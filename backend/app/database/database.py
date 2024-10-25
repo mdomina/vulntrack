@@ -90,32 +90,35 @@ class MyDB():
         try:
             remediations = []
             for remediation in self.collection_vapt.find():
-               del remediation['data']
-               value = {
-                   "id": str(remediation['_id']),
-                   "anno": remediation['anno'],
-                   "mese": remediation['mese'],
-                   "nome": remediation['nome'],
-                   "type": remediation['type'],
-                   "codice_elettra": remediation['codice_elettra'],
-                   "cliente": remediation['cliente']
-               }
-               remediations.append(value)
+                # Rimuove il campo 'findings' per evitare di includere dati non necessari
+                # del remediation['findings']
+                
+                value = {
+                    "id": str(remediation['_id']),
+                    "anno": remediation.get('date', '')[:4],  # Anno estratto dalla data
+                    "mese": remediation.get('date', '')[5:7],  # Mese estratto dalla data
+                    "nome": remediation.get('name', ''),
+                    "type": remediation.get('auditType', ''),
+                    "codice_elettra": ('-'),  # Default '-' se non presente
+                    "cliente": remediation.get('company', '')
+                }
+                remediations.append(value)
             return remediations
         except Exception as e:
             logger.error(f"estrazione remediation list: {e}")
             return None
     
-    def remediation_list_name(self):
+    def audit_list_name_by_company(self, company:str) -> list:
+        """estrae i nomi degli audits in base alla company"""
         try:
             list_name = []
-            for remediation in self.collection_vapt.find():
-                list_name.append(remediation['nome'])
+            for audit in self.collection_vapt.find({'company': company},{'company':1}):
+                list_name.append(audit['company'])
                 list_name.sort(key=str.lower)
             return list_name
         except Exception as e:
-            logger.error(f"remediation list name: {e}")
-            return None
+            logger.error(f"audit list name: {e}")
+            return []
         
     def delete_remediation(self, id_documento):
         try:
