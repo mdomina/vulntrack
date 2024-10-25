@@ -114,6 +114,103 @@ name_vapt, sizes_vapt, vuln_type_names, vuln_type_sizes, severity_names, severit
 
 months, critical, high, medium, low = get_vuln_data_by_month()
 
+def get_vuln_data_for_vapt_and_recheck():
+    # Dati di severità per VAPT e Recheck
+    vapt_data = {'Critica': 0, 'Alta': 0, 'Media': 0, 'Bassa': 0}
+    recheck_data = {'Critica': 0, 'Alta': 0, 'Media': 0, 'Bassa': 0}
+
+    severity_map = {
+        'Critical': 'Critica',
+        'High': 'Alta',
+        'Medium': 'Media',
+        'Low': 'Bassa'
+    }
+
+    for item in mongo_data:
+        findings = item.get('findings', [])
+        audit_type = item.get('auditType', 'VAPT')  # Se non è presente, assumiamo che sia VAPT
+
+        for finding in findings:
+            severity = finding.get('severity', 'Unknown')
+            severity_name = severity_map.get(severity, 'Unknown')
+
+            if severity_name in vapt_data:
+                if audit_type.lower() == 'recheck':
+                    recheck_data[severity_name] += 1
+                else:
+                    vapt_data[severity_name] += 1
+
+    return vapt_data, recheck_data
+
+
+from collections import defaultdict
+
+def get_vuln_data_for_vapt_and_recheck_by_category():
+    # Dati per tipologia per VAPT e Recheck
+    vapt_data_by_category = defaultdict(int)
+    recheck_data_by_category = defaultdict(int)
+
+    # Mappa per le tipologie da MongoDB
+    for item in mongo_data:
+        findings = item.get('findings', [])
+        audit_type = item.get('auditType', 'VAPT')  # Se non è presente, assumiamo che sia VAPT
+
+        for finding in findings:
+            vuln_type = finding.get('vulnType', 'Unknown')
+
+            if audit_type.lower() == 'recheck':
+                recheck_data_by_category[vuln_type] += 1
+            else:
+                vapt_data_by_category[vuln_type] += 1
+
+    # Debug: Stampa tutte le categorie trovate
+
+
+    # Otteniamo tutte le categorie uniche
+    all_categories = sorted(set(vapt_data_by_category.keys()).union(set(recheck_data_by_category.keys())))
+
+    # Assicuriamoci che entrambe le liste abbiano valori per tutte le categorie
+    vapt_counts = [vapt_data_by_category[category] for category in all_categories]
+    recheck_counts = [recheck_data_by_category[category] for category in all_categories]
+
+    return vapt_counts, recheck_counts, all_categories
+
+vapt_counts, recheck_counts, categories = get_vuln_data_for_vapt_and_recheck_by_category()
+
+# Dati dinamici per il riepilogo Recheck e VAPT
+vapt_data, recheck_data = get_vuln_data_for_vapt_and_recheck()
+
+
+def get_vuln_data_for_vapt_and_recheck_by_name():
+    # Dati per vulnerabilità per nome per VAPT e Recheck
+    vapt_data_by_name = defaultdict(int)
+    recheck_data_by_name = defaultdict(int)
+
+    # Mappa per le vulnerabilità da MongoDB
+    for item in mongo_data:
+        findings = item.get('findings', [])
+        audit_type = item.get('auditType', 'VAPT')  # Se non è presente, assumiamo che sia VAPT
+
+        for finding in findings:
+            vuln_name = finding.get('title', 'Unknown')
+
+            if audit_type.lower() == 'recheck':
+                recheck_data_by_name[vuln_name] += 1
+            else:
+                vapt_data_by_name[vuln_name] += 1
+
+    # Otteniamo tutti i nomi unici
+    all_names = sorted(set(vapt_data_by_name.keys()).union(set(recheck_data_by_name.keys())))
+
+    # Assicuriamoci che entrambe le liste abbiano valori per tutti i nomi
+    vapt_counts = [vapt_data_by_name[name] for name in all_names]
+    recheck_counts = [recheck_data_by_name[name] for name in all_names]
+
+    return vapt_counts, recheck_counts, all_names
+
+vapt_name_counts, recheck_name_counts, all_names = get_vuln_data_for_vapt_and_recheck_by_name()
+
+
 # Funzione per sostituire i tag nel documento Word
 def replace_tag_with_chart(doc, tag, image_path, image_width=Inches(5)):
     for paragraph in doc.paragraphs:
@@ -137,17 +234,12 @@ def replace_tag_with_donut_charts(doc, tag):
             paragraph._element.addnext(table._element)
 
 # Funzione per leggere e modificare un documento Word esistente
-def modify_word_document_with_charts(input_doc_path, output_doc_path, mongo_data):
+def modify_word_document_with_charts(input_doc_path, output_doc_path):
     doc = Document(input_doc_path)
-
-    # Dati per i grafici
-    # Estrai i dati dalla risposta MongoDB per usarli nei grafici
-    labels_recheck = ['Buffer Overflow', 'Cross-Site Scripting', 'SQL Injection', 'Weak Password Requirements']
-    sizes_recheck = [10, 8, 6, 4]
     
-    data_vapt = [0, 0, 11, 6]  # Dati per VAPT
-    data_recheck = [0, 0, 2, 3]  # Dati per Recheck
-    
+    # Crea il grafico di riepilogo Recheck usando la classe Recheck
+    vapt_values = list(vapt_data.values())  # Estrai i valori
+    recheck_values = list(recheck_data.values())  # Estrai i valori
  # Crea i dati per i grafici a ciambella sulla base della severity
     severity_color_map = {
         'Critica': 'brown',
@@ -157,11 +249,6 @@ def modify_word_document_with_charts(input_doc_path, output_doc_path, mongo_data
     }
     
     donut_data = [(count, severity, severity_color_map.get(severity, 'grey'), f'{severity.lower()}.png') for severity, count in zip(severity_names, severity_sizes)]
-   
-    data_vapt_tipologia = [4, 1, 2, 4, 6]
-    data_recheck_tipologia = [2, 0, 1, 2, 4]
-    categories = ['Security Misconfiguration', 'Identification', 'Cryptographic Failures', 'Injection', 'Insecure Design']
-
 
     # Genera i grafici usando la classe DrawGraphs
     draw_graphs.create_horizontal_bar_chart_name(name_vapt, sizes_vapt, 'horizontal_bar_chart_by_name.png')
@@ -172,10 +259,10 @@ def modify_word_document_with_charts(input_doc_path, output_doc_path, mongo_data
     draw_graphs.create_bar_chart_by_category(vuln_type_names,vuln_type_sizes, 'bar_chart_by_category.png')
 
     # Genera il grafico di riepilogo Recheck usando la classe Recheck
-    recheck.create_recheck_summary(data_vapt, data_recheck, 'recheck_summary.png')
-    recheck.create_vapt_recheck_summary(data_vapt, data_recheck, 'vapt_recheck_summary.png')
-    recheck.create_vapt_recheck_histogram(data_vapt_tipologia, data_recheck_tipologia, categories, 'vapt_recheck_histogram.png')
-    recheck.create_histogram_vuln_by_name(name_vapt, sizes_vapt, labels_recheck, sizes_recheck, 'vuln_histogram_by_name.png')
+    recheck.create_recheck_summary(vapt_values, recheck_values, 'recheck_summary.png')
+    recheck.create_vapt_recheck_summary(vapt_values, recheck_values, 'vapt_recheck_summary.png')
+    recheck.create_vapt_recheck_histogram(vapt_counts, recheck_counts, categories, 'vapt_recheck_histogram.png')
+    recheck.create_histogram_vuln_by_name(all_names, vapt_name_counts, all_names, recheck_name_counts, 'vuln_histogram_by_name.png')
 
     # Sostituisci i tag con i grafici
     replace_tag_with_chart(doc, '{{tag_graficotimeline}}', os.path.join(graph_dir, 'timeline_chart.png'))
@@ -203,5 +290,5 @@ file_template_recheck = os.path.join(template_dir, 'recheck.docx')
 file_output_recheck = os.path.join(output_dir, 'output_report_recheck.docx')
 
 mongo_data = get_data_from_mongo()
-modify_word_document_with_charts(file_template_dashboard, file_output_dashboard, mongo_data)
-modify_word_document_with_charts(file_template_recheck, file_output_recheck, mongo_data)
+modify_word_document_with_charts(file_template_dashboard, file_output_dashboard)
+modify_word_document_with_charts(file_template_recheck, file_output_recheck)
