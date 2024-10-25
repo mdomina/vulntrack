@@ -21,7 +21,8 @@ class UserDataResponseModel(BaseModel):
     name: str
     username: str
     email: EmailStr
-    role: UserRole 
+    role: UserRole
+    companies: list[str] 
 
 class UserInDB(BaseModel):
     """La classe UserInDB eredita tutti i campi dalla classe User (ovvero username, email, full_name, disabled), e aggiunge un campo addizionale hashed_password."""

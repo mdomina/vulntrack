@@ -58,7 +58,7 @@ export default new Router({
                 },
                 {
                     name: 'Recheck',
-                    path: 'dashboard/recheck/:nomeApp',
+                    path: 'dashboard/recheck/:nomeApp/:cliente',
                     props: true,
                     component: () => import('@/views/dashboard/Recheck'),
                 },
@@ -81,6 +81,12 @@ export default new Router({
                     name: 'ListRemediation',
                     path: 'list/remediation',
                     component: () => import('@/views/pages/RemediationList'),
+                },
+
+                {
+                    name: 'AdminDashboard',
+                    path: 'dashboard/AdminDashboard',
+                    component: () => import('@/views/pages/AdminDashboard'),
                 },
 
             ]

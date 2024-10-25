@@ -14,12 +14,9 @@
                                     <v-btn type="submit" color="primary">Login</v-btn>
                                 </v-form>
                             </v-card-text>
-
                         </v-card>
                     </v-col>
                 </v-row>
-
-
             </v-container>
             <Footer></Footer>
         </v-main>
@@ -47,18 +44,23 @@ export default {
             axios.post(urlBackend, this.dataUser).then((response) => {
                 localStorage.setItem('token', response.data.access_token);
                 this.$store.dispatch('actSetAuth');
-                this.$store.dispatch('userInfo').then(()=>{
-                    this.$router.push('/')
-                })
+                this.$store.dispatch('userInfo').then(() => {
+                    this.$router.push('/');
+                    this.$toast.success('Login effettuato con successo', { duration: 3000, theme: "bubble" });
+                });
             }).catch((error) => {
-                if(error.response.status == 401){
-                this.$toasted.error('Username o Password Sbagliate', {duration: 3000, theme: "bubble"});
-
+                if (error.response && error.response.status === 401) {
+                    this.$toast.error('Username o Password Sbagliate', { duration: 3000, theme: "bubble" });
+                } else {
+                    this.$toast.error('Errore durante il login. Riprova più tardi.', { duration: 3000, theme: "bubble" });
                 }
-
+                console.error("Errore durante il login:", error); // Log per il debug
             });
         }
     }
 };
 </script>
-  
+
+<style scoped>
+/* Aggiungi stili personalizzati se necessario */
+</style>

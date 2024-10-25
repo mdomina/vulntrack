@@ -3,8 +3,9 @@
         <v-row>
             <v-col cols="12">
                 <v-card :elevation="1">
-                    <v-card-title>
-                        {{ nomeApp }}
+                    <v-card-title class="d-flex justify-space-between align-center">
+                        <span>App:{{ nomeApp }} | Ente:{{ cliente }}</span>
+                        <v-btn color="primary" @click="fetchAdditionalData">Scarica Documento</v-btn>
                     </v-card-title>
                 </v-card>
             </v-col>
@@ -222,16 +223,30 @@ export default {
         dataRemediation: { recheck: {}, vapt: {} },
         recheckData: []
     }),
-    props: ['nomeApp'],
+    props: ['nomeApp', 'cliente'],
     methods: {
         getData() {
-            let data = { nome: this.nomeApp, type: '' }
+            let data = { nome: this.nomeApp, type: '' };
             axios.post("/recheck/data", data).then(res => {
-                this.dataRemediation = res.data
-                this.recheckData = res.data.recheck[0].data
-            })
+                this.dataRemediation = res.data;
+                this.recheckData = res.data.recheck[0]?.data || [];
+            });
+        },
+        fetchAdditionalData() { //metodo per recuperare dati per il documento tramite App ed Ente
+            // Passaggio di `nomeApp` e `cliente` al componente
+            const payload = { nome: this.nomeApp, cliente: this.$route.params.cliente };
+
+            axios.post("/recheck/additionalData", payload) //<--MODIFICARE API
+                .then(res => {
+                    console.log("Dati aggiuntivi caricati:", res.data);
+                    // Aggiungi i dati ricevuti come necessario
+                })
+                .catch(error => {
+                    console.error("Errore nel caricamento dei dati aggiuntivi:", error);
+                });
         }
-    },
+    }
+,
     watch: {
         nomeApp() {
             this.getData();
