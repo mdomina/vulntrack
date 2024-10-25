@@ -99,6 +99,7 @@ def get_vuln_data_from_mongo():
     title_counts = Counter(findings_titles)
     vuln_type_counts = Counter(vuln_types)
     severity_counts = Counter(severities)
+    print(severity_counts)
 
     # Ritorna i titoli unici, la loro frequenza, i vulnType unici, il loro conteggio e le severity
     name_vapt = list(title_counts.keys())  # Titoli unici delle vulnerabilità
@@ -111,6 +112,8 @@ def get_vuln_data_from_mongo():
     return name_vapt, sizes_vapt, vuln_type_names, vuln_type_sizes, severity_names, severity_sizes
 
 name_vapt, sizes_vapt, vuln_type_names, vuln_type_sizes, severity_names, severity_sizes = get_vuln_data_from_mongo()
+
+print(severity_sizes)
 
 months, critical, high, medium, low = get_vuln_data_by_month()
 
@@ -250,6 +253,7 @@ def modify_word_document_with_charts(input_doc_path, output_doc_path):
     
     donut_data = [(count, severity, severity_color_map.get(severity, 'grey'), f'{severity.lower()}.png') for severity, count in zip(severity_names, severity_sizes)]
     # Estrai i valori di severità da vapt_data per il grafico a torta
+    print(donut_data)
     severity_labels = ['Critica', 'Alta', 'Media', 'Bassa']  # Le etichette rimangono invariate
     severity_colors = ['brown', 'red', 'orange', 'green']  # I colori per ciascuna severità
 
