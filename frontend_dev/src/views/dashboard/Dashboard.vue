@@ -8,7 +8,7 @@
                     
                     <!--filtro ricerca-->
                     <filtri :dataRemediation="dataRemediation" @updateDataRemediation="handleUpdateDataRemediation"
-                        @clearFilterd="getDataRemediation">
+                        @clearFiltered="getDataRemediation">
                     </filtri>
                 </v-card-title>
                 </v-card>

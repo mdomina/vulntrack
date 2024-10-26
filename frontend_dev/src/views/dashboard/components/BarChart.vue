@@ -114,7 +114,7 @@ export default {
     let uniqueMonths = [...new Set([].concat(...Object.values(countData).map(Object.keys)))];
 
     // Ordinamento dei mesi in ordine temporale
-    const monthNames = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+    const monthNames = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
     uniqueMonths.sort((a, b) => monthNames.indexOf(a) - monthNames.indexOf(b));
 
     // Creazione di dati di serie

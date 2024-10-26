@@ -45,7 +45,7 @@ export default {
             search: '',
             headers: [
                 { text: 'Nome', align: 'start', value: 'nome' },
-                { text: 'Codice Elettra', align: 'start', value: 'codice_elettra' },
+                //{ text: 'Codice Elettra', align: 'start', value: 'codice_elettra' },
                 { text: 'Azienda', value: 'cliente'},
                 { text: 'Anno', value: 'anno' },
                 { text: 'VAPT', value: 'vapt', align: 'center' },

@@ -2,7 +2,7 @@ from typing import Annotated
 from app.database.database import MyDB
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.model.model import InputNomeApp
+from app.model.model import InputFilteredAudit
 from app.utility.format_rechecks import filter_rechecks
 from app.utility.mapping_vulnerability import MappingVulnerability
 from app.utility.users import get_current_user
@@ -43,7 +43,7 @@ async def list_recheck(current_user: Annotated[UserInDB, Depends(get_current_use
         )
 
 @router.post("/data")
-async def recheck_data(nome_app: InputNomeApp):
+async def recheck_data(nome_app: InputFilteredAudit):
     """Endpoint per la dashboard di comparazione tra vapt e recheck per la singola app"""
     try:
         vapt = mydb.ricerca_filtrata({'nome': nome_app.nome, 'type': 'vapt'})

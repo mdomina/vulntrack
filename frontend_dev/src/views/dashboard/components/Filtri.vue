@@ -15,11 +15,11 @@
             <v-row>
               <v-col cols="12">
                 <!-- Selettore per Enti -->
-                <v-select :items="companies" label="Enti" v-model="selectedCompany" item-text="name" item-value="id" :required="false"></v-select>
+                <v-select :items="companies" label="Enti" v-model="selectedCompany" item-text="name" item-value="id" :required="true"></v-select>
               </v-col>
               <v-col cols="12">
                 <!-- Selettore per Nome App -->
-                <v-select :items="appNames" label="Nome App" v-model="nomeApp" :required="false"></v-select>
+                <v-select :items="appNames" label="Nome App" v-model="nomeApp" :required="true"></v-select>
               </v-col>
               <v-col cols="12">
                 <!-- Radio per tipo app -->
@@ -65,24 +65,24 @@ export default {
       .catch(err => console.error('Errore nel recupero delle companies:', err));
     },
     getNameApps(selectedCompany) {
-  if (!selectedCompany) return;  // Verifica che sia selezionato un ente
-  const urlBackend = process.env.VUE_APP_VAPT_NAMES_APP;
-  axios.post(urlBackend, { company_name: selectedCompany })
-    .then(res => {
-      this.appNames = res.data;
-      })
-    .catch(err => console.error('Errore nel recupero delle app:', err));
+      if (!selectedCompany) return;  // Verifica che sia selezionato un ente
+      const urlBackend = process.env.VUE_APP_VAPT_NAMES_APP;
+      axios.post(urlBackend, { company_name: selectedCompany })
+        .then(res => {
+          this.appNames = res.data;
+          })
+        .catch(err => console.error('Errore nel recupero delle app:', err));
     },
     filteredData() {
       const data = { nome: this.nomeApp, type: this.typeApp, company: this.selectedCompany };
-      const urlBackend = process.env.VUE_APP_VAPT_LIST_FILTERED;
+      const urlBackend = process.env.VUE_APP_VAPT_FILTERED;
       axios.post(urlBackend, data)
       .then(res => {
         if (res.data.length > 0) {
           this.dialog = false;
           this.$emit('updateDataRemediation', res.data); // Invia i dati filtrati alla dashboard
         } else {
-          this.$toasted.show('Documento Non Trovato!', {
+          this.$toast.error('Documento Non Trovato!', {
             duration: 3000,
             theme: "bubble",
             fullWidth: false,

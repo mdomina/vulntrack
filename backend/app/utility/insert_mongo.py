@@ -7,8 +7,6 @@ from pymongo.errors import PyMongoError
 import hashlib  
 
 class InsertMongo():
-
-
     def __init__(self):
 
         # Inizializzazione del client
@@ -115,6 +113,7 @@ class InsertMongo():
         
         try:
             lista_pwndoc = self.createList()
+            print(len(lista_pwndoc))
             lista_vuln = self.vulnlist()
 
             missing_vulntrack, extra_vulntrack = self.setsDiff(lista_pwndoc, lista_vuln)

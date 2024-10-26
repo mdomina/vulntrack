@@ -23,7 +23,7 @@ export default {
             search: '',
             headers: [
                 { text: 'Nome', value: 'nome', align:'center' },
-                { text: 'Codice Elettra', value: 'codice_elettra', align:'center' },
+                //{ text: 'Codice Elettra', value: 'codice_elettra', align:'center' },
                 { text: 'Tipologia', value: 'type', align:'center' },
                 { text: 'Anno', value: 'anno', align:'center' },
                 //{ text: 'Mese', value: 'mese', align:'center' },
