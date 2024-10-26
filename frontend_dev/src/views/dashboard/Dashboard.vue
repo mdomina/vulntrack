@@ -141,10 +141,12 @@ export default {
             ['checkAuth']
         ),
         handleUpdateDataRemediation(newData) {
+            console.log(newData);
             this.dataRemediation = newData
-            let nomeApp = newData[0].nome
-            let typeApp = newData[0].type.toUpperCase()
-            this.nomeAppFiltrata = nomeApp + ' - ' + typeApp
+            let nomeApp = newData[0].name
+            let company= newData[0].company
+            let typeApp = newData[0].auditType
+            this.nomeAppFiltrata = company + ' - ' + nomeApp + ' - ' + typeApp
         },
         getDataRemediation() {
             const urlBackend = process.env.VUE_APP_VAPT_DATA_DASHBOARD;
