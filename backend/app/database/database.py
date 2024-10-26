@@ -59,7 +59,6 @@ class MyDB():
     def ping(self):
         try:
             self.client.admin.command('ping')
-            print("Pinged your deployment. You successfully connected to MongoDB!")
         except Exception as e:
             logger.error(f"ping database: {e}")
 
@@ -153,7 +152,4 @@ class MyDB():
             logger.error(f"estrazione companies: {e}")
         return companies
 
-if __name__=='__main__':
-    db = MyDB()
-    print(db.aggregazione())
         

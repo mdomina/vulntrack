@@ -75,8 +75,3 @@ def normalize_gravity(gravity):
 #         tb = traceback.format_exc()
 #         logger.error(f"estrazione data excel: {e}")
 #         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Errore lettura file")
-
-
-if __name__=='__main__':
-    data = convert_data()
-    print(data)

@@ -113,7 +113,6 @@ class InsertMongo():
         
         try:
             lista_pwndoc = self.createList()
-            print(len(lista_pwndoc))
             lista_vuln = self.vulnlist()
 
             missing_vulntrack, extra_vulntrack = self.setsDiff(lista_pwndoc, lista_vuln)

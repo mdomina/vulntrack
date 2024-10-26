@@ -5,13 +5,14 @@ from app.model.model import InputFilteredAudit, InputCompanyName, InputPrint
 from app.model.user_model import UserInDB, UserRole
 from app.utility.mapping_vulnerability import MappingVulnerability
 from app.utility.users import get_current_user
+from app.utility.reportCreation.index import ReportGenerator
 
 router = APIRouter(prefix="/vapt")
-mydb = MyDB()
 
 @router.post("/filtered")
 async def vapt_list_name(audit_filtered: InputFilteredAudit ,current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """Endpoint per avere la lista vapt o recheck filtrati per nome"""
+    mydb = MyDB()
     if current_user.role ==  UserRole.USER:
         if audit_filtered.company not in current_user.companies:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Non autorizzato")
@@ -34,6 +35,8 @@ async def vapt_list_name(audit_filtered: InputFilteredAudit ,current_user: Annot
 @router.post("/names/app")
 async def list_names_app(current_user: Annotated[UserInDB, Depends(get_current_user)],  company_input: InputCompanyName):
     """Endpoint per avere i nomi di tutte le app testate, usato per i filtri della dashboard"""
+    mydb = MyDB()
+
     if  current_user.role != UserRole.ADMIN:
         if company_input.company_name not in current_user.companies:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
@@ -48,6 +51,8 @@ async def list_names_app(current_user: Annotated[UserInDB, Depends(get_current_u
 @router.get("/data/dashboard")
 async def vapt_data(current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """Endpoint per avere la lista vapt da inserire nella dashboard"""
+    mydb = MyDB()
+
     if current_user.role ==  UserRole.ADMIN:
         audits = mydb.ricerca_filtrata({
             'auditType': {'$ne': 'Recheck'}, 
@@ -75,7 +80,7 @@ async def companies_list(current_user: Annotated[UserInDB, Depends(get_current_u
 @router.post("/print")
 async def vapt_list_name(audit_filtered: InputPrint ,current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """Endpoint per stampare il report"""
-
+    mydb = MyDB()
     # se è stata richiesta un app specifica
     if audit_filtered.name != '':
         if current_user.role ==  UserRole.USER:
@@ -104,6 +109,10 @@ async def vapt_list_name(audit_filtered: InputPrint ,current_user: Annotated[Use
                 'auditType': {'$ne': 'Recheck'}, 
                 'company': {'$in': current_user.companies}
                 })
+    print(audits)
+    report_generator = ReportGenerator(mongo_data=mydb.collection_vapt.find())
+    report_generator.generate_report('dashboard.docx', 'output_report_dashboard.docx')
+    report_generator.generate_report('recheck.docx', 'output_report_recheck.docx')
 
     #mapping = MappingVulnerability()
-    print(audits)
+    
