@@ -22,34 +22,11 @@ export default new Router({
             },
             children: [
                 // Components
-                {
-                    name: 'Alerts',
-                    path: 'pages/alerts',
-                    component: () => import('@/views/pages/Alerts'),
-                },
 
                 {
                     name: 'Profile',
                     path: 'pages/profile',
                     component: () => import('@/views/pages/Profile'),
-                },
-
-                {
-                    name: 'Icons',
-                    path: 'pages/icons',
-                    component: () => import('@/views/pages/Icons'),
-                },
-
-                {
-                    name: 'TableSimple',
-                    path: 'pages/tables-simple',
-                    component: () => import('@/views/pages/TableSimple'),
-                },
-
-                {
-                    name: 'BasciDashboard',
-                    path: 'dashboard/basic-dashboard',
-                    component: () => import('@/views/dashboard/BasicDashboard'),
                 },
                 {
                     name: 'Dashboard',
@@ -62,34 +39,43 @@ export default new Router({
                     props: true,
                     component: () => import('@/views/dashboard/Recheck'),
                 },
+                
                 {
                     name: 'RecheckList',
                     path: 'list/recheck',
                     component: () => import('@/views/pages/RecheckList'),
                 },
-                {
-                    name: 'Upload',
-                    path: 'upload/remediation',
-                    component: () => import('@/views/pages/Upload'),
-                },
-                {
-                    name: 'RemediationUploaded',
-                    path: 'uploaded/remediation',
-                    component: () => import('@/views/pages/RemediationUploaded'),
-                },
+                
                 {
                     name: 'ListRemediation',
                     path: 'list/remediation',
-                    component: () => import('@/views/pages/RemediationList'),
-                },
-
-                {
-                    name: 'AdminDashboard',
-                    path: 'dashboard/AdminDashboard',
-                    component: () => import('@/views/pages/AdminDashboard'),
-                },
+                    component: () => import('@/views/pages/AuditsList'),
+                },        
 
             ]
+        },
+        {
+            path: '/admin',
+            component: () => import('@/layouts/Layout'),
+            beforeEnter: (to, from, next) => {
+                if (store.state.user.auth) {
+                    if(store.state.user.role != 'admin'){
+                        next('/');
+                    }else{
+                        next();
+                    }
+                } else {
+                    next('/login');
+                }
+            },
+            children: [
+                {
+                    name: 'Users',
+                    path: 'users',
+                    component: () => import('@/views/pages/Users'),
+                },
+                
+            ],
         },
         {
             path: '/login',

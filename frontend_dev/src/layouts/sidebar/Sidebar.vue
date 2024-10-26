@@ -59,36 +59,6 @@ export default {
     },
   },
   data: () => ({
-    oldItems: [
-      {
-        title: "Dashboard Example",
-        icon: "mdi-view-dashboard",
-        to: "/dashboard/basic-dashboard",
-      },
-      {
-        title: "Profile",
-        icon: "mdi-account-circle",
-        to: "/pages/profile",
-      },
-
-      {
-        title: "Alerts",
-        icon: "mdi-alert",
-        to: "/pages/alerts",
-      },
-
-      {
-        title: "Icons",
-        icon: "mdi-emoticon",
-        to: "/pages/icons",
-      },
-
-      {
-        title: "Basic Table",
-        icon: "mdi-table-column-width",
-        to: "/pages/tables-simple",
-      }, 
-    ],
     items:[
     {
         title: "Dashboard",
@@ -109,21 +79,9 @@ export default {
         role:"user"
       },
       {
-        title: "Upload VAPT",
-        icon: "mdi-file-upload",
-        to: "/upload/remediation",
-        role:"admin"
-      },
-      {
-        title: "Lista VAPT",
+        title: "Users",
         icon: "mdi-format-list-bulleted",
-        to: "/uploaded/remediation",
-        role:"admin"
-      },
-      {
-        title: "Admin Dashboard",
-        icon: "mdi-format-list-bulleted",
-        to: "/dashboard/AdminDashboard",
+        to: "/admin/users",
         role:"admin"
       },
     ]
