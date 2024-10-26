@@ -12,7 +12,7 @@ class LoginData(BaseModel):
     password: str
 
 class InputFilteredAudit(BaseModel):
-    nome: str
+    nome: str # nome app
     type: str
     company: str
 
@@ -21,6 +21,15 @@ class InputFilteredAudit(BaseModel):
         if not value or value.strip() == '':
             raise ValueError('Il campo non può essere vuoto o contenere solo spazi')
         return value
+
+class InputPrint(BaseModel):
+    name: str
+    type: str
+    company: str
+
+    @field_validator('name', 'type', 'company')
+    def strip_strings(cls, value:str):
+        return value.strip()
 
 class InputCompanyName(BaseModel):
     company_name:str

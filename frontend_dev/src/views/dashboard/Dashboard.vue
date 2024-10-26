@@ -2,13 +2,21 @@
     <v-container fluid class="down-top-padding">
         <v-row>
             <v-col cols="12">
+                <v-btn color="primary" dark @click="stampaReport">
+                    Stampa Report
+                </v-btn>
+            </v-col>
+        </v-row>
+        <v-row>
+            <v-col cols="12">
                 <v-card>
                     <v-card-title>
-                        {{ nomeAppFiltrata }}
-                    
+                        <template  v-if="auditFiltered.company != ''">
+                            {{ auditFiltered.company }} - {{  auditFiltered.name }} -  {{ auditFiltered.type }}
+                        </template>
                     <!--filtro ricerca-->
                     <filtri :dataRemediation="dataRemediation" @updateDataRemediation="handleUpdateDataRemediation"
-                        @clearFiltered="getDataRemediation">
+                        @clearFiltered="clearFilter">
                     </filtri>
                 </v-card-title>
                 </v-card>
@@ -134,25 +142,37 @@ export default {
     },
     data: () => ({
         dataRemediation: [],
-        nomeAppFiltrata: ''
+        auditFiltered: {
+            "company": "",
+            "name":"",
+            "type":""
+        }
     }),
     methods: {
         ...mapActions(
             ['checkAuth']
         ),
         handleUpdateDataRemediation(newData) {
-            console.log(newData);
             this.dataRemediation = newData
-            let nomeApp = newData[0].name
-            let company= newData[0].company
-            let typeApp = newData[0].auditType
-            this.nomeAppFiltrata = company + ' - ' + nomeApp + ' - ' + typeApp
+            this.auditFiltered.name = newData[0].name
+            this.auditFiltered.company = newData[0].company
+            this.auditFiltered.type = newData[0].auditType
+            
         },
         getDataRemediation() {
             const urlBackend = process.env.VUE_APP_VAPT_DATA_DASHBOARD;
             axios.get(urlBackend).then(res => {
                 this.dataRemediation = res.data
             })
+        },
+        clearFilter(){
+            this.auditFiltered.name = "";
+            this.auditFiltered.company = "";
+            this.auditFiltered.type = "";
+            this.getDataRemediation();
+        },
+        stampaReport(){
+            axios.post('/vapt/print', this.auditFiltered)
         }
     },
     beforeMount() {

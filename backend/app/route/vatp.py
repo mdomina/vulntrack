@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.database.database import MyDB
-from app.model.model import InputFilteredAudit, InputCompanyName
+from app.model.model import InputFilteredAudit, InputCompanyName, InputPrint
 from app.model.user_model import UserInDB, UserRole
 from app.utility.mapping_vulnerability import MappingVulnerability
 from app.utility.users import get_current_user
@@ -33,7 +33,7 @@ async def vapt_list_name(audit_filtered: InputFilteredAudit ,current_user: Annot
 
 @router.post("/names/app")
 async def list_names_app(current_user: Annotated[UserInDB, Depends(get_current_user)],  company_input: InputCompanyName):
-    """Endpoint per avere i nomi di tutte le app testate"""
+    """Endpoint per avere i nomi di tutte le app testate, usato per i filtri della dashboard"""
     if  current_user.role != UserRole.ADMIN:
         if company_input.company_name not in current_user.companies:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
@@ -63,7 +63,7 @@ async def vapt_data(current_user: Annotated[UserInDB, Depends(get_current_user)]
 
 @router.get("/companies/list")
 async def companies_list(current_user: Annotated[UserInDB, Depends(get_current_user)]):
-    """Endpoint per avere la lista delle società in base all'utente"""
+    """Endpoint per avere la lista delle società in base all'utente, usato per i filtri della dashboard"""
     
     mydb = MyDB()
     if current_user.role == UserRole.ADMIN:
@@ -71,3 +71,39 @@ async def companies_list(current_user: Annotated[UserInDB, Depends(get_current_u
     else:
         companies = mydb.get_filtered_companies(current_user.companies)
         return companies
+
+@router.post("/print")
+async def vapt_list_name(audit_filtered: InputPrint ,current_user: Annotated[UserInDB, Depends(get_current_user)]):
+    """Endpoint per stampare il report"""
+
+    # se è stata richiesta un app specifica
+    if audit_filtered.name != '':
+        if current_user.role ==  UserRole.USER:
+            if audit_filtered.company not in current_user.companies:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Non autorizzato")
+        
+        if audit_filtered.type == 'recheck':
+            audits = mydb.ricerca_filtrata({
+                'auditType': audit_filtered.company, 
+                'company':audit_filtered.company,
+                'name':audit_filtered.name
+                })
+        else:
+            audits = mydb.ricerca_filtrata({
+                'auditType': {'$ne': 'Recheck'}, 
+                'company':audit_filtered.company,
+                'name':audit_filtered.name
+                })
+    else: # se non è stata richiesta un app specifica
+        if current_user.role ==  UserRole.ADMIN:
+            audits = mydb.ricerca_filtrata({
+                'auditType': {'$ne': 'Recheck'}, 
+                })
+        else:
+            audits = mydb.ricerca_filtrata({
+                'auditType': {'$ne': 'Recheck'}, 
+                'company': {'$in': current_user.companies}
+                })
+
+    #mapping = MappingVulnerability()
+    print(audits)
