@@ -22,6 +22,19 @@ class InputFilteredAudit(BaseModel):
             raise ValueError('Il campo non può essere vuoto o contenere solo spazi')
         return value
 
+class InputRecheckCompared(BaseModel):
+    """Modello di input per ricevere i dati necessari a confrontare i 
+    risultati del test iniziale e del recheck per la stessa applicazione e lo stesso ente."""
+
+    name: str # nome app
+    company: str
+
+    @field_validator('name', 'company')
+    def non_empty_strings(cls, value:str):
+        if not value or value.strip() == '':
+            raise ValueError('Il campo non può essere vuoto o contenere solo spazi')
+        return value
+
 class InputPrint(BaseModel):
     name: str
     type: str

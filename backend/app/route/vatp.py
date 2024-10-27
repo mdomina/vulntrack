@@ -5,7 +5,6 @@ from app.model.model import InputFilteredAudit, InputCompanyName, InputPrint
 from app.model.user_model import UserInDB, UserRole
 from app.utility.mapping_vulnerability import MappingVulnerability
 from app.utility.users import get_current_user
-from app.utility.reportCreation.index import ReportGenerator
 
 router = APIRouter(prefix="/vapt")
 
@@ -109,10 +108,6 @@ async def vapt_list_name(audit_filtered: InputPrint ,current_user: Annotated[Use
                 'auditType': {'$ne': 'Recheck'}, 
                 'company': {'$in': current_user.companies}
                 })
-    print(audits)
-    report_generator = ReportGenerator(mongo_data=mydb.collection_vapt.find())
-    report_generator.generate_report('dashboard.docx', 'output_report_dashboard.docx')
-    report_generator.generate_report('recheck.docx', 'output_report_recheck.docx')
-
+    
     #mapping = MappingVulnerability()
     

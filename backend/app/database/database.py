@@ -62,10 +62,11 @@ class MyDB():
         except Exception as e:
             logger.error(f"ping database: {e}")
 
-    def ricerca_filtrata(self, filtro):
+    def ricerca_filtrata(self, filtro:dict):
+
         """effettua una get, filtrando i risultati"""
         try:
-            results = []
+            results:list[dict] = []
             # In questo caso, cerchiamo tutti i documenti dove il campo 'type' è uguale al valore passato.
             for result in self.collection_vapt.find(filtro,{'_id':0}):
                 results.append(result)
@@ -77,7 +78,7 @@ class MyDB():
     def audit_list_name_by_company(self, company:str) -> list:
         """estrae i nomi degli audits in base alla company"""
         try:
-            list_name = []
+            list_name:list[dict] = []
             for audit in self.collection_vapt.find({'company': company},{'name':1}):
                 list_name.append(audit['name'])
                 list_name.sort(key=str.lower)
@@ -134,7 +135,7 @@ class MyDB():
         
     def get_all_companies(self):
         """estrazione di tutti i clienti a cui è stato fatto un vapt"""
-        companies = []
+        companies:list[str] = []
         try:
             for company in self.collection_vapt.find({},{'company':1}):
                 companies.append(company['company'])
@@ -144,7 +145,7 @@ class MyDB():
     
     def get_filtered_companies(self, user_companies: list[str]):
         """estrazione dei i clienti a cui è stato fatto un vapt in base ai permessi degli utenti"""
-        companies = []
+        companies:list[str] = []
         try:
             for company in self.collection_vapt.find({'company': {'$in': user_companies}},{'company':1,'_id':0}):
                 companies.append(company['company'])

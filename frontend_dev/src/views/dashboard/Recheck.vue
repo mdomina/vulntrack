@@ -4,8 +4,8 @@
             <v-col cols="12">
                 <v-card :elevation="1">
                     <v-card-title class="d-flex justify-space-between align-center">
-                        <span>App:{{ nomeApp }} | Ente:{{ cliente }}</span>
-                        <v-btn color="primary" @click="fetchAdditionalData">Scarica Documento</v-btn>
+                        <span>{{ company }} - {{ nameApp }}</span>
+                        <v-btn color="primary" @click="printReport">Scarica Documento</v-btn>
                     </v-card-title>
                 </v-card>
             </v-col>
@@ -205,15 +205,15 @@
 </template>
 <script>
 import axios from 'axios';
-import DonutChart from './components/DonutChart.vue';
-import RadarChart from './components/RadarChart.vue';
-import TreemapChart from './components/TreemapChart.vue';
-import ColumnsRecheck from './components/ColumnsRecheck.vue';
-import CardRecheck from './components/CardRecheck.vue';
-
+import DonutChartRecheck from './components/recheck/DonutChartRecheck.vue';
+import RadarChart from './components/recheck/RadarChartRecheck.vue';
+import TreemapChart from './components/recheck/TreemapChart.vue';
+import ColumnsRecheck from './components/recheck/ColumnsRecheck.vue';
+import CardRecheck from './components/recheck/CardRecheck.vue';
+import { mapActions } from 'vuex';
 export default {
     components: {
-        donutchart: DonutChart,
+        donutchart: DonutChartRecheck,
         radarchart: RadarChart,
         treemapchart: TreemapChart,
         columnsrecheck: ColumnsRecheck,
@@ -223,28 +223,26 @@ export default {
         dataRemediation: { recheck: {}, vapt: {} },
         recheckData: []
     }),
-    props: ['nomeApp', 'cliente'],
+    props: ['nameApp', 'company'],
     methods: {
-        getData() {
-            let data = { nome: this.nomeApp, type: '' };
-            axios.post("/recheck/data", data).then(res => {
-                this.dataRemediation = res.data;
-                this.recheckData = res.data.recheck[0]?.data || [];
-            });
-        },
-        fetchAdditionalData() { //metodo per recuperare dati per il documento tramite App ed Ente
+        ...mapActions(
+            ['checkAuth']
+        ),
+        getData() { //metodo per recuperare dati per il documento tramite App ed Ente
             // Passaggio di `nomeApp` e `cliente` al componente
-            const payload = { nome: this.nomeApp, cliente: this.$route.params.cliente };
-
-            axios.post("/recheck/additionalData", payload) //<--MODIFICARE API
+            const payload = { name: this.$route.params.nameApp, company: this.$route.params.company };
+            const urlBackend = process.env.VUE_APP_RECHECK_DASHBOARD;
+            axios.post(urlBackend, payload)
                 .then(res => {
-                    console.log("Dati aggiuntivi caricati:", res.data);
+                    this.dataRemediation = res.data;
+                    this.recheckData = res.data.recheck.findings
                     // Aggiungi i dati ricevuti come necessario
                 })
                 .catch(error => {
                     console.error("Errore nel caricamento dei dati aggiuntivi:", error);
                 });
-        }
+        },
+        printReport(){}
     }
 ,
     watch: {
@@ -253,6 +251,7 @@ export default {
         }
     },
     mounted() {
+        this.checkAuth();
         this.getData();
     }
 }

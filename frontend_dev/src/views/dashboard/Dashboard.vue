@@ -172,7 +172,8 @@ export default {
             this.getDataRemediation();
         },
         stampaReport(){
-            axios.post('/vapt/print', this.auditFiltered)
+            const urlBackend = process.env.VUE_APP_VAPT_PRINT_DASHBOARD;
+            axios.post(urlBackend, this.auditFiltered)
         }
     },
     beforeMount() {

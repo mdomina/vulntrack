@@ -35,7 +35,7 @@ export default new Router({
                 },
                 {
                     name: 'Recheck',
-                    path: 'dashboard/recheck/:nomeApp/:cliente',
+                    path: 'dashboard/recheck/:nameApp/:company',
                     props: true,
                     component: () => import('@/views/dashboard/Recheck'),
                 },

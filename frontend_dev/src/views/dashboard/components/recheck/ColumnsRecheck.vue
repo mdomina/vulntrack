@@ -87,27 +87,26 @@ export default {
     methods: {
         formatData() {
             let vulnerabilitaCount = {
-                'critica': 0,
-                'alta': 0,
-                'media': 0,
-                'bassa': 0,
+                'Critical': 0,
+                'High': 0,
+                'Medium': 0,
+                'Low': 0,
             };
 
-            for (let item of this.data) {
-                for (let vulnerabilita of item.data) {
-                    if (vulnerabilita.gravità in vulnerabilitaCount) {
-                        vulnerabilitaCount[vulnerabilita.gravità]++;
-                    }
+            for (let vulnerabilita of this.data.findings) {
+                if (vulnerabilita.severity in vulnerabilitaCount) {
+                    vulnerabilitaCount[vulnerabilita.severity]++;
                 }
             }
 
             let series = [{
                 name: 'Vulnerabilità',
-                data: Object.values(vulnerabilitaCount) // questo ti darà un array [0, 3, 0, 1] (o qualunque sia il conteggio)
+                data: Object.values(vulnerabilitaCount)
             }];
 
-            this.series = series
+            this.series = series;
         }
+
     },
     watch: {
         data: {
