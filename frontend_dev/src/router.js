@@ -86,9 +86,14 @@ export default new Router({
         {
             path: '/logout',
             name: 'logout',
-            component: () => import('@/views/Logout'),
+            component: () => import('@/views/pages/Logout'),
             
-        }
+        },
+        {
+            path: '/:catchAll(.*)', // Catch-all per route non trovate
+            name: 'NotFound',
+            component: () => import('@/views/pages/404'),
+          },
 
     ],
 })

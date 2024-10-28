@@ -7,6 +7,7 @@ import os
 from pymongo import MongoClient
 from collections import Counter
 from collections import defaultdict
+# from app.database.database import MyDB
 
 # Inizializza la classe DrawGraphs
 draw_graphs = DrawGraphs()
@@ -18,6 +19,10 @@ recheck = Recheck()
 client = MongoClient('mongodb://10.0.0.21:27017/')  # Sostituisci con l'URI corretto se necessario
 db = client['vulntrack']  # Nome del database
 collection = db['vapt']  # Nome della collezione
+
+# mydb = MyDB()
+# mydb.collection_vapt
+
 
 output_dir = 'output'
 graph_dir = 'grafici'
@@ -156,7 +161,7 @@ def get_vuln_data_for_vapt_and_recheck_by_category():
     # Mappa per le tipologie da MongoDB
     for item in mongo_data:
         findings = item.get('findings', [])
-        audit_type = item.get('auditType', 'VAPT')  # Se non è presente, assumiamo che sia VAPT
+        audit_type:str = item.get('auditType', 'VAPT')  # Se non è presente, assumiamo che sia VAPT
 
         for finding in findings:
             vuln_type = finding.get('vulnType', 'Unknown')
@@ -304,3 +309,19 @@ file_output_recheck = os.path.join(output_dir, 'output_report_recheck.docx')
 mongo_data = get_data_from_mongo()
 modify_word_document_with_charts(file_template_dashboard, file_output_dashboard)
 modify_word_document_with_charts(file_template_recheck, file_output_recheck)
+
+if __name__=='__main__':
+    pass
+    # class GeneraReport():
+    #     def __init__(, nome_template) -> None:
+    #         controllo_cartelle()
+
+    #     def controllo_cartelle():
+    #         ....
+
+    #     def run_vapt():
+    #         ...
+        
+    #     def run_recheck():
+    #         ...
+        # def set_template():

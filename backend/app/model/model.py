@@ -36,9 +36,9 @@ class InputRecheckCompared(BaseModel):
         return value
 
 class InputPrint(BaseModel):
-    name: str
-    type: str
-    company: str
+    name: str # nome app
+    type: str # tipologia vatp/recheck
+    company: str 
 
     @field_validator('name', 'type', 'company')
     def strip_strings(cls, value:str):

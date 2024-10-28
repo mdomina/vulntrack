@@ -15,9 +15,9 @@ async def vapt_list_name(audit_filtered: InputFilteredAudit ,current_user: Annot
     if current_user.role ==  UserRole.USER:
         if audit_filtered.company not in current_user.companies:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Non autorizzato")
-    if audit_filtered.type == 'recheck':
+    if audit_filtered.type.lower() == 'recheck':
         audits = mydb.ricerca_filtrata({
-            'auditType': audit_filtered.company, 
+            'auditType': 'Recheck', 
             'company':audit_filtered.company,
             'name':audit_filtered.nome
             })
@@ -61,7 +61,7 @@ async def vapt_data(current_user: Annotated[UserInDB, Depends(get_current_user)]
             'auditType': {'$ne': 'Recheck'}, 
             'company': {'$in': current_user.companies}
             })
-    mapping = MappingVulnerability()
+    # mapping = MappingVulnerability()
     return audits
     #return mapping.format_vulerabiliy_name(audits)
 
@@ -80,34 +80,44 @@ async def companies_list(current_user: Annotated[UserInDB, Depends(get_current_u
 async def vapt_list_name(audit_filtered: InputPrint ,current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """Endpoint per stampare il report"""
     mydb = MyDB()
-    # se è stata richiesta un app specifica
-    if audit_filtered.name != '':
-        if current_user.role ==  UserRole.USER:
-            if audit_filtered.company not in current_user.companies:
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Non autorizzato")
+    # se il campo nome è vuoto stampa l'intera dashboard con tutti i dati dei vapt (non deve stampare i recheck)
+    if audit_filtered.name == '':
         
-        if audit_filtered.type == 'recheck':
-            audits = mydb.ricerca_filtrata({
-                'auditType': audit_filtered.company, 
-                'company':audit_filtered.company,
-                'name':audit_filtered.name
-                })
-        else:
-            audits = mydb.ricerca_filtrata({
-                'auditType': {'$ne': 'Recheck'}, 
-                'company':audit_filtered.company,
-                'name':audit_filtered.name
-                })
-    else: # se non è stata richiesta un app specifica
-        if current_user.role ==  UserRole.ADMIN:
-            audits = mydb.ricerca_filtrata({
-                'auditType': {'$ne': 'Recheck'}, 
-                })
-        else:
+        if current_user.role ==  UserRole.USER:
             audits = mydb.ricerca_filtrata({
                 'auditType': {'$ne': 'Recheck'}, 
                 'company': {'$in': current_user.companies}
                 })
+        else: # se è un admin
+            audits = mydb.ricerca_filtrata({
+                'auditType': {'$ne': 'Recheck'}, 
+                })
+            
+        # run vapt
+            
+    else: # è stata selezionata un app specifica
+
+        if current_user.role ==  UserRole.USER: # controllo permessi utente verso le companies
+            if audit_filtered.company not in current_user.companies:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Non autorizzato")
+
+        if audit_filtered.type.lower() == 'recheck': # se l'audit è un recheck
+            audits = mydb.ricerca_filtrata({
+                'auditType': "Recheck", 
+                'company':audit_filtered.company,
+                'name':audit_filtered.name
+                })
+            # run recheck
+        else:
+            audits = mydb.ricerca_filtrata({
+                'auditType': {'$ne': 'Recheck'}, 
+                'company':audit_filtered.company,
+                'name':audit_filtered.name
+                })
+            # run vapt
     
+    # genera_report = GeneraReport(audits)
+    # genera_report.run_vapt/recheck
+    print(audits)
     #mapping = MappingVulnerability()
     
