@@ -1,3 +1,4 @@
+import pprint
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.database.database import MyDB
@@ -5,7 +6,9 @@ from app.model.model import InputFilteredAudit, InputCompanyName, InputPrint
 from app.model.user_model import UserInDB, UserRole
 from app.utility.mapping_vulnerability import MappingVulnerability
 from app.utility.users import get_current_user
+from app.utility.reportCreation.index import GeneralReport
 
+ 
 router = APIRouter(prefix="/vapt")
 
 @router.post("/filtered")
@@ -94,6 +97,9 @@ async def vapt_list_name(audit_filtered: InputPrint ,current_user: Annotated[Use
                 })
             
         # run vapt
+        general_report = GeneralReport(audits)   
+        general_report.set_template('dashboard.docx', 'output_report_dashboard.docx')
+        general_report.run_vapt()
             
     else: # è stata selezionata un app specifica
 
@@ -108,6 +114,13 @@ async def vapt_list_name(audit_filtered: InputPrint ,current_user: Annotated[Use
                 'name':audit_filtered.name
                 })
             # run recheck
+            general_report = GeneralReport(audits)   
+            general_report.set_template('dashboard.docx', 'output_report_dashboard.docx')
+            general_report.run_vapt()
+            # general_report = GeneralReport(audits)            
+            # general_report.set_template('recheck.docx','output_report_recheck.docx') 
+            # general_report.run_recheck()
+
         else:
             audits = mydb.ricerca_filtrata({
                 'auditType': {'$ne': 'Recheck'}, 
@@ -115,6 +128,9 @@ async def vapt_list_name(audit_filtered: InputPrint ,current_user: Annotated[Use
                 'name':audit_filtered.name
                 })
             # run vapt
+            general_report = GeneralReport(audits)   
+            general_report.set_template('dashboard.docx', 'output_report_dashboard.docx')
+            general_report.run_vapt()
     
     # genera_report = GeneraReport(audits)
     # genera_report.run_vapt/recheck
