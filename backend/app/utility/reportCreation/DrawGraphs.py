@@ -45,10 +45,32 @@ class DrawGraphs:
         plt.savefig(file)
         plt.close()
 
+
     def create_pie_chart(self, labels, sizes, colors, output_filename):
+        # Filtra le etichette e le dimensioni per rimuovere gli elementi con size = 0
+        filtered_labels = [label for label, size in zip(labels, sizes) if size > 0]
+        filtered_sizes = [size for size in sizes if size > 0]
+        filtered_colors = [color for color, size in zip(colors, sizes) if size > 0]
+
+        print("Filtered sizes:", filtered_sizes)
+        print("Filtered labels:", filtered_labels)
+
         fig, ax = plt.subplots()
-        ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=colors)
-        ax.axis('equal')
+
+        # Funzione per mostrare solo le percentuali maggiori di zero
+        def autopct_format(pct):
+            return ('%1.1f%%' % pct) if pct > 0 else ''
+
+        ax.pie(
+            filtered_sizes, 
+            labels=filtered_labels, 
+            autopct=autopct_format,  # Usa la funzione personalizzata
+            startangle=90, 
+            colors=filtered_colors
+        )
+        ax.axis('equal')  # Per fare in modo che il grafico sia un cerchio
+
+        # Salva il grafico
         file = os.path.join(self.graph_dir, output_filename)
         plt.savefig(file)
         plt.close()

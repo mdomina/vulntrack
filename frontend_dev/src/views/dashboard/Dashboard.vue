@@ -171,11 +171,35 @@ export default {
             this.auditFiltered.type = "";
             this.getDataRemediation();
         },
-        stampaReport(){
+        stampaReport() {
             const urlBackend = process.env.VUE_APP_VAPT_PRINT_DASHBOARD;
-            axios.post(urlBackend, this.auditFiltered)
+
+            axios.post(urlBackend, this.auditFiltered, { responseType: 'blob' })
+                .then((response) => {
+                    // Crea un URL temporaneo per il blob
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+                    // Crea un elemento <a> per scaricare il file
+                    const link = document.createElement('a');
+                    link.href = url;
+
+                    // Imposta il nome corretto del file con estensione .docx
+                    link.setAttribute('download', 'report.docx');
+
+                    // Aggiungi l'elemento <a> al DOM e attiva il click
+                    document.body.appendChild(link);
+                    link.click();
+
+                    // Rimuovi l'elemento <a> e libera l'URL temporaneo
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch((error) => {
+                    console.error("Errore nel download del report:", error);
+                });
         }
-    },
+
+},
     beforeMount() {
         this.checkAuth();
         this.getDataRemediation();

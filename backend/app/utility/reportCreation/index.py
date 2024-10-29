@@ -19,6 +19,7 @@ class GeneralReport:
         self.vapt_graphs = DrawGraphs()  
         self.recheck = Recheck()       
         self.mongo_data = mongo_data
+    
 
     def controllo_cartelle(self):
         """Crea le cartelle necessarie se non esistono."""
@@ -42,13 +43,15 @@ class GeneralReport:
         self.output_path = os.path.join(self.output_dir, output_name)
 
     def run_vapt(self):
+        
+        is_recheck = any(item.get('auditType', '').lower() == 'recheck' for item in self.mongo_data)
+
         """Logica per generare il report VAPT."""
         # Estrazione e calcolo dei dati
         name_vapt, sizes_vapt, vuln_type_names, vuln_type_sizes, severity_names, severity_sizes = get_vuln_data_from_mongo(self.mongo_data)
         months, critical, high, medium, low = get_vuln_data_by_month(self.mongo_data)
-        vapt_data, _ = get_vuln_data_for_vapt_and_recheck(self.mongo_data)
+        vapt_data, recheck_data = get_vuln_data_for_vapt_and_recheck(self.mongo_data)  # Ottieni sia vapt_data che recheck_data
         severity_colors = ['brown', 'red', 'orange', 'green']  # I colori per ciascuna severità
-
         # Definizione della mappa colori per i grafici a ciambella
         severity_color_map = {
             'Critical': 'brown',
@@ -56,22 +59,35 @@ class GeneralReport:
             'Medium': 'orange',
             'Low': 'green'
         }
-        donut_data = [(count, severity, severity_color_map.get(severity, 'grey'), f'{severity.lower()}.png') 
-                      for severity, count in zip(severity_names, severity_sizes)]
-        severity_labels = ['Critica', 'Alta', 'Media', 'Bassa']  # Le etichette rimangono invariate
-        severity_counts_vapt = [vapt_data['Critica'], vapt_data['Alta'], vapt_data['Media'], vapt_data['Bassa']]
+        
+        if is_recheck:
+            donut_data = [(count, severity, severity_color_map.get(severity, 'grey'), f'{severity.lower()}.png') 
+                        for severity, count in zip(severity_names, recheck_data.values())]
+            pie_chart_data = list(recheck_data.values())
+            pie_chart_name = 'pie_chart_recheck.png'
+            
+        else:
+            donut_data = [(count, severity, severity_color_map.get(severity, 'grey'), f'{severity.lower()}.png') 
+                        for severity, count in zip(severity_names, vapt_data.values())]
+            pie_chart_data = list(vapt_data.values())
+            pie_chart_name = 'pie_chart_vapt.png'
+      
+        self.vapt_graphs.create_horizontal_bar_chart_name(name_vapt, sizes_vapt, os.path.join(self.graph_dir, 'horizontal_bar_chart_by_name.png'))
+        self.vapt_graphs.create_timeline_chart(
+            ['2023-09-28', '2023-10-16', '2023-11-03', '2023-11-21', '2023-12-09'],
+            [8, 1, 1, 1, 1], [4, 5, 6, 2, 1], [12, 10, 7, 9, 8], [8, 4, 2, 8, 2],
+            os.path.join(self.graph_dir, 'timeline_chart.png')
+        )
+        self.vapt_graphs.create_pie_chart(severity_names, pie_chart_data, severity_colors, os.path.join(self.graph_dir, pie_chart_name))
+        self.vapt_graphs.create_horizontal_bar_chart_months(months, critical, high, medium, low, os.path.join(self.graph_dir, 'horizontal_bar_chart.png'))
+        self.vapt_graphs.create_bar_chart_by_category(vuln_type_names, vuln_type_sizes, os.path.join(self.graph_dir, 'bar_chart_by_category.png'))
 
-        # Creazione dei grafici
-        self.vapt_graphs.create_horizontal_bar_chart_name(name_vapt, sizes_vapt, os.path.join(self.graph_dir, 'horizontal_bar_chart_by_name.png'))        
-        self.vapt_graphs.create_timeline_chart(['2023-09-28', '2023-10-16', '2023-11-03', '2023-11-21', '2023-12-09'], [8, 1, 1, 1, 1], [4, 5, 6, 2, 1], [12, 10, 7, 9, 8], [8, 4, 2, 8, 2], os.path.join(self.graph_dir, 'timeline_chart.png'))        
-        self.vapt_graphs.create_pie_chart(severity_labels, severity_counts_vapt, severity_colors, os.path.join(self.graph_dir, 'pie_chart.png'))        
-        self.vapt_graphs.create_horizontal_bar_chart_months(months, critical, high, medium, low, os.path.join(self.graph_dir, 'horizontal_bar_chart.png'))        
-        self.vapt_graphs.create_bar_chart_by_category(vuln_type_names, vuln_type_sizes, os.path.join(self.graph_dir, 'bar_chart_by_category.png'))        
+        # Creazione di grafici a ciambella per ciascuna severità sia per VAPT che per Recheck
         self.vapt_graphs.create_all_donut_charts(donut_data)
+
 
         # Modifica del documento Word
         self.modify_word_document_with_charts(self.template_path, self.output_path)
-
     def run_recheck(self):
         """Logica per generare il report Recheck."""
         # Estrazione e calcolo dei dati
@@ -91,8 +107,14 @@ class GeneralReport:
     def modify_word_document_with_charts(self, input_doc_path, output_doc_path):
         """Modifica un documento Word inserendo i grafici generati."""
         doc = Document(input_doc_path)
+        
+        # Determina se il tipo di audit è Recheck o VAPT
+        is_recheck = any(item.get('auditType', '').lower() == 'recheck' for item in self.mongo_data)
+        pie_chart_name = 'pie_chart_recheck.png' if is_recheck else 'pie_chart_vapt.png'
+
+        # Sostituisce i tag con i grafici specifici
         self.replace_tag_with_chart(doc, '{{tag_graficotimeline}}', os.path.join(self.graph_dir, 'timeline_chart.png'))
-        self.replace_tag_with_chart(doc, '{{tag_complessive}}', os.path.join(self.graph_dir, 'pie_chart.png'))
+        self.replace_tag_with_chart(doc, '{{tag_complessive}}', os.path.join(self.graph_dir, pie_chart_name))
         self.replace_tag_with_chart(doc, '{{tag_mensili}}', os.path.join(self.graph_dir, 'horizontal_bar_chart.png'))
         self.replace_tag_with_chart(doc, '{{tag_name}}', os.path.join(self.graph_dir, 'horizontal_bar_chart_by_name.png'))
         self.replace_tag_with_chart(doc, '{{tag_categoria}}', os.path.join(self.graph_dir, 'bar_chart_by_category.png'))
@@ -108,6 +130,7 @@ class GeneralReport:
 
         # Salva il documento modificato
         doc.save(output_doc_path)
+
 
 
 

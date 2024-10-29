@@ -7,6 +7,8 @@ from app.model.user_model import UserInDB, UserRole
 from app.utility.mapping_vulnerability import MappingVulnerability
 from app.utility.users import get_current_user
 from app.utility.reportCreation.index import GeneralReport
+from fastapi.responses import FileResponse
+import os
 
  
 router = APIRouter(prefix="/vapt")
@@ -80,60 +82,56 @@ async def companies_list(current_user: Annotated[UserInDB, Depends(get_current_u
         return companies
 
 @router.post("/print")
-async def vapt_list_name(audit_filtered: InputPrint ,current_user: Annotated[UserInDB, Depends(get_current_user)]):
+async def vapt_list_name(audit_filtered: InputPrint, current_user: Annotated[UserInDB, Depends(get_current_user)]):
     """Endpoint per stampare il report"""
     mydb = MyDB()
-    # se il campo nome è vuoto stampa l'intera dashboard con tutti i dati dei vapt (non deve stampare i recheck)
+    
+    # Percorso completo della cartella di output
+    output_folder = os.path.join(os.path.dirname(__file__), '..', 'utility', 'reportCreation', 'output')
+    output_file = os.path.join(output_folder, "output_report_dashboard.docx")
+    
+
+    # Verifica se il campo nome è vuoto, così da stampare l'intera dashboard
     if audit_filtered.name == '':
-        
-        if current_user.role ==  UserRole.USER:
+        if current_user.role == UserRole.USER:
             audits = mydb.ricerca_filtrata({
                 'auditType': {'$ne': 'Recheck'}, 
                 'company': {'$in': current_user.companies}
-                })
-        else: # se è un admin
-            audits = mydb.ricerca_filtrata({
-                'auditType': {'$ne': 'Recheck'}, 
-                })
-            
-        # run vapt
-        general_report = GeneralReport(audits)   
-        general_report.set_template('dashboard.docx', 'output_report_dashboard.docx')
+            })
+        else:
+            audits = mydb.ricerca_filtrata({'auditType': {'$ne': 'Recheck'}})
+        
+        # Genera il report
+        general_report = GeneralReport(audits)
+        general_report.set_template('dashboard.docx', "output_report_dashboard.docx")
         general_report.run_vapt()
-            
-    else: # è stata selezionata un app specifica
-
-        if current_user.role ==  UserRole.USER: # controllo permessi utente verso le companies
+        
+    else:
+        if current_user.role == UserRole.USER:
             if audit_filtered.company not in current_user.companies:
                 raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Non autorizzato")
 
-        if audit_filtered.type.lower() == 'recheck': # se l'audit è un recheck
+        if audit_filtered.type.lower() == 'recheck':
             audits = mydb.ricerca_filtrata({
                 'auditType': "Recheck", 
-                'company':audit_filtered.company,
-                'name':audit_filtered.name
-                })
-            # run recheck
-            general_report = GeneralReport(audits)   
-            general_report.set_template('dashboard.docx', 'output_report_dashboard.docx')
+                'company': audit_filtered.company,
+                'name': audit_filtered.name
+            })
+            general_report = GeneralReport(audits)
+            general_report.set_template('dashboard.docx', "output_report_dashboard.docx")
             general_report.run_vapt()
-            # general_report = GeneralReport(audits)            
-            # general_report.set_template('recheck.docx','output_report_recheck.docx') 
-            # general_report.run_recheck()
-
+            
         else:
             audits = mydb.ricerca_filtrata({
                 'auditType': {'$ne': 'Recheck'}, 
-                'company':audit_filtered.company,
-                'name':audit_filtered.name
-                })
-            # run vapt
-            general_report = GeneralReport(audits)   
-            general_report.set_template('dashboard.docx', 'output_report_dashboard.docx')
+                'company': audit_filtered.company,
+                'name': audit_filtered.name
+            })
+            general_report = GeneralReport(audits)
+            general_report.set_template('dashboard.docx', "output_report_dashboard.docx")
             general_report.run_vapt()
-    
-    # genera_report = GeneraReport(audits)
-    # genera_report.run_vapt/recheck
-    print(audits)
-    #mapping = MappingVulnerability()
-    
+    # Verifica l'esistenza del file prima di restituirlo
+    if not os.path.exists(output_file):
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Errore nella generazione del report")
+    # Restituisci il file come risposta
+    return FileResponse(path=output_file, filename="output_report_dashboard.docx", media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
