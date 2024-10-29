@@ -51,10 +51,6 @@ class DrawGraphs:
         filtered_labels = [label for label, size in zip(labels, sizes) if size > 0]
         filtered_sizes = [size for size in sizes if size > 0]
         filtered_colors = [color for color, size in zip(colors, sizes) if size > 0]
-
-        print("Filtered sizes:", filtered_sizes)
-        print("Filtered labels:", filtered_labels)
-
         fig, ax = plt.subplots()
 
         # Funzione per mostrare solo le percentuali maggiori di zero

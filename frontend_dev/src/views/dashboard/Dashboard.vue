@@ -183,8 +183,12 @@ export default {
                     const link = document.createElement('a');
                     link.href = url;
 
-                    // Imposta il nome corretto del file con estensione .docx
-                    link.setAttribute('download', 'report.docx');
+                    // Costruisci il nome del file dinamicamente
+                    const dateStr = new Date().toISOString().split('T')[0];
+                    const filename = `Report-${this.auditFiltered.type}-${this.auditFiltered.company}-${this.auditFiltered.name}-${dateStr}.docx`;
+
+                    // Imposta il nome del file per il download
+                    link.setAttribute('download', filename);
 
                     // Aggiungi l'elemento <a> al DOM e attiva il click
                     document.body.appendChild(link);
@@ -198,6 +202,7 @@ export default {
                     console.error("Errore nel download del report:", error);
                 });
         }
+
 
 },
     beforeMount() {

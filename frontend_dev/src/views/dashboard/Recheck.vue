@@ -221,7 +221,11 @@ export default {
     },
     data: () => ({
         dataRemediation: { recheck: {}, vapt: {} },
-        recheckData: []
+        recheckData: [],
+        auditFiltered: {
+            "company": "",
+            "name":"",
+        },
     }),
     props: ['nameApp', 'company'],
     methods: {
@@ -242,7 +246,39 @@ export default {
                     console.error("Errore nel caricamento dei dati aggiuntivi:", error);
                 });
         },
-        printReport(){}
+        printReport(){
+            const urlBackend = "/recheck/printrecheck" //process.env.VUE_APP_VAPT_PRINT_DASHBOARD_RECHECK;
+            this.auditFiltered.name = this.$route.params.nameApp;
+            this.auditFiltered.company = this.$route.params.company;
+
+            axios.post(urlBackend, this.auditFiltered, { responseType: 'blob' })
+                .then((response) => {
+                    // Crea un URL temporaneo per il blob
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+                    // Crea un elemento <a> per scaricare il file
+                    const link = document.createElement('a');
+                    link.href = url;
+
+                    // Costruisci il nome del file dinamicamente
+                    const dateStr = new Date().toISOString().split('T')[0];
+                    const filename = `Report-${this.auditFiltered.type}-${this.auditFiltered.company}-${this.auditFiltered.name}-${dateStr}.docx`;
+
+                    // Imposta il nome del file per il download
+                    link.setAttribute('download', filename);
+
+                    // Aggiungi l'elemento <a> al DOM e attiva il click
+                    document.body.appendChild(link);
+                    link.click();
+
+                    // Rimuovi l'elemento <a> e libera l'URL temporaneo
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                })
+                .catch((error) => {
+                    console.error("Errore nel download del report:", error);
+                });
+        }
     }
 ,
     watch: {
