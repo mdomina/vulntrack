@@ -79,6 +79,12 @@ export default {
         role:"user"
       },
       {
+        title: "Account",
+        icon: "mdi-account-circle",
+        to: "/pages/profile",
+        role:"user"
+      },
+      {
         title: "Users",
         icon: "mdi-format-list-bulleted",
         to: "/admin/users",

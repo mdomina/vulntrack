@@ -247,7 +247,7 @@ export default {
                 });
         },
         printReport(){
-            const urlBackend = "/recheck/printrecheck" //process.env.VUE_APP_VAPT_PRINT_DASHBOARD_RECHECK;
+            const urlBackend = process.env.VUE_APP_VAPT_PRINT_DASHBOARD_RECHECK;
             this.auditFiltered.name = this.$route.params.nameApp;
             this.auditFiltered.company = this.$route.params.company;
 
@@ -262,7 +262,7 @@ export default {
 
                     // Costruisci il nome del file dinamicamente
                     const dateStr = new Date().toISOString().split('T')[0];
-                    const filename = `Report-${this.auditFiltered.type}-${this.auditFiltered.company}-${this.auditFiltered.name}-${dateStr}.docx`;
+                    const filename = `Rechek-${this.auditFiltered.type}-${this.auditFiltered.company}-${this.auditFiltered.name}-${dateStr}.docx`;
 
                     // Imposta il nome del file per il download
                     link.setAttribute('download', filename);

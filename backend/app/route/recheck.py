@@ -80,14 +80,13 @@ async def recheck_vapt_document(audit_filtered: InputRecheckCompared, current_us
 
     # Controlla il ruolo dell'utente
     if current_user.role == UserRole.USER:
-            audits = mydb.ricerca_filtrata({
-                'company': {'$in': current_user.companies}
-            })
+        audits = mydb.ricerca_filtrata({
+            'company': audit_filtered.company,
+            'name': audit_filtered.name
+        })
     else:
-            audits = mydb.ricerca_filtrata({
-                            'company': audit_filtered.company,
-                            'name': audit_filtered.name
-            })        
+        # Se l'utente non è USER, non applichiamo alcun filtro
+        audits = mydb.ricerca_filtrata({})
 
     # Genera il report
     general_report = GeneralReport(audits)

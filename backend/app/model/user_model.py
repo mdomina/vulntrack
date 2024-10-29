@@ -99,3 +99,35 @@ class NewUserModel(BaseModel):
 class DeleteUser(BaseModel):
     """Modello per la cancellazione di un utente."""
     email: EmailStr
+
+
+
+    # Definizione del modello Pydantic per gestire le richieste di cambio password
+class ChangePasswordModel(BaseModel):
+    old_password: str  # Campo per la password corrente dell'utente
+    new_password: str  # Campo per la nuova password proposta dall'utente
+
+    # Validatore Pydantic specifico per il campo 'new_password'
+    @field_validator('new_password')
+    def validate_new_password(cls, v):
+        # Verifica che la nuova password abbia almeno 8 caratteri
+        # Solleva un ValueError se la condizione non è soddisfatta
+        if len(v) < 12:
+            raise ValueError('La password deve contenere almeno 12 caratteri')
+        
+        # Controlla la presenza di almeno un numero nella nuova password
+        # Utilizza una espressione regolare per cercare qualsiasi cifra da 0 a 9
+        if not re.search(r'\d', v):
+            raise ValueError('La password deve contenere almeno un numero')
+        
+        # Verifica che la nuova password contenga almeno un carattere speciale
+        # L'espressione regolare cerca qualsiasi carattere specificato nella stringa di caratteri speciali
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
+            raise ValueError('La password deve contenere almeno un carattere speciale')
+        
+        # Verifica che la nuova password contenga almeno una lettera maiuscola
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('La password deve contenere almeno una lettera maiuscola')
+        
+        # Ritorna il valore della password validata se tutti i controlli sono passati
+        return v

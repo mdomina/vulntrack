@@ -153,4 +153,14 @@ class MyDB():
             logger.error(f"estrazione companies: {e}")
         return companies
 
-        
+    def update_user_password(self, user_email: str, new_password: str) -> bool:
+
+        try:
+            result = self.collection_users.update_one(
+                {"email": user_email},
+                {"$set": {"password": new_password}}
+            )
+            return result.modified_count > 0  # Ritorna True se è stato modificato almeno un documento
+        except Exception as e:
+            logger.error(f"Errore durante l'aggiornamento della password: {e}")
+            return False

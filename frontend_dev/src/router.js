@@ -22,12 +22,6 @@ export default new Router({
             },
             children: [
                 // Components
-
-                {
-                    name: 'Profile',
-                    path: 'pages/profile',
-                    component: () => import('@/views/pages/Profile'),
-                },
                 {
                     name: 'Dashboard',
                     path: 'dashboard/dashboard',
@@ -50,6 +44,11 @@ export default new Router({
                     name: 'ListRemediation',
                     path: 'list/remediation',
                     component: () => import('@/views/pages/AuditsList'),
+                },
+                {
+                    name: 'Profile',
+                    path: 'pages/profile',
+                    component: () => import('@/views/pages/Profile'),
                 },        
 
             ]
@@ -73,8 +72,7 @@ export default new Router({
                     name: 'Users',
                     path: 'users',
                     component: () => import('@/views/pages/Users'),
-                },
-                
+                },               
             ],
         },
         {
@@ -94,6 +92,5 @@ export default new Router({
             name: 'NotFound',
             component: () => import('@/views/pages/404'),
           },
-
     ],
 })
