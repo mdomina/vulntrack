@@ -51,3 +51,4 @@ apscheduler
 cvss
 matplotlib
 python-docx
+docx2pdf

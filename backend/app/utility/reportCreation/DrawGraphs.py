@@ -30,20 +30,20 @@ class DrawGraphs:
         plt.savefig(file)
         plt.close()
 
-    def create_timeline_chart(self, dates, critical, high, medium, low, output_filename):
-        dates = [datetime.strptime(date, '%Y-%m-%d') for date in dates]
-        fig, ax = plt.subplots()
-        ax.bar(dates, critical, label='Critica', color='brown')
-        ax.bar(dates, high, bottom=critical, label='Alta', color='red')
-        ax.bar(dates, medium, bottom=[i + j for i, j in zip(critical, high)], label='Media', color='orange')
-        ax.bar(dates, low, bottom=[i + j + k for i, j, k in zip(critical, high, medium)], label='Bassa', color='green')
-        ax.set_ylabel('Numero di Vulnerabilità')
-        ax.legend()
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%d %b'))
-        fig.autofmt_xdate()
-        file = os.path.join(self.graph_dir, output_filename)
-        plt.savefig(file)
-        plt.close()
+    # def create_timeline_chart(self, dates, critical, high, medium, low, output_filename):
+    #     dates = [datetime.strptime(date, '%Y-%m-%d') for date in dates]
+    #     fig, ax = plt.subplots()
+    #     ax.bar(dates, critical, label='Critica', color='brown')
+    #     ax.bar(dates, high, bottom=critical, label='Alta', color='red')
+    #     ax.bar(dates, medium, bottom=[i + j for i, j in zip(critical, high)], label='Media', color='orange')
+    #     ax.bar(dates, low, bottom=[i + j + k for i, j, k in zip(critical, high, medium)], label='Bassa', color='green')
+    #     ax.set_ylabel('Numero di Vulnerabilità')
+    #     ax.legend()
+    #     ax.xaxis.set_major_formatter(mdates.DateFormatter('%d %b'))
+    #     fig.autofmt_xdate()
+    #     file = os.path.join(self.graph_dir, output_filename)
+    #     plt.savefig(file)
+    #     plt.close()
 
 
     def create_pie_chart(self, labels, sizes, colors, output_filename):
@@ -73,25 +73,36 @@ class DrawGraphs:
 
     def create_bar_chart_by_category(self, labels, sizes, output_filename):
         fig, ax = plt.subplots()
-        ax.bar(labels, sizes, color='skyblue')
+        ax.bar(labels, sizes, color='skyblue', width=0.2)
+        ax.set_xlim(-0.5, len(labels) - 0.5)
         ax.set_ylabel('Numero di Vulnerabilità')
         plt.xticks(rotation=45, ha='right')
         plt.tight_layout()
         file = os.path.join(self.graph_dir, output_filename)
         plt.savefig(file)
         plt.close()
-
+ 
     def create_horizontal_bar_chart_months(self, categories, critical, high, medium, low, output_filename):
-        fig, ax = plt.subplots()
-        ax.barh(categories, critical, label='Critica', color='brown')
-        ax.barh(categories, high, left=critical, label='Alta', color='red')
-        ax.barh(categories, medium, left=[i + j for i, j in zip(critical, high)], label='Media', color='orange')
-        ax.barh(categories, low, left=[i + j + k for i, j, k in zip(critical, high, medium)], label='Bassa', color='green')
+        fig, ax = plt.subplots(figsize=(6, 4))  # Riduce ulteriormente le dimensioni della figura
+        bar_height = 0.3  # Imposta uno spessore delle barre più piccolo
+    
+        # Creazione delle barre
+        ax.barh(categories, critical, label='Critica', color='brown', height=bar_height)
+        ax.barh(categories, high, left=critical, label='Alta', color='red', height=bar_height)
+        ax.barh(categories, medium, left=[i + j for i, j in zip(critical, high)], label='Media', color='orange', height=bar_height)
+        ax.barh(categories, low, left=[i + j + k for i, j, k in zip(critical, high, medium)], label='Bassa', color='green', height=bar_height)
+        # Aggiungi etichette e legenda
         ax.set_xlabel('Numero di Vulnerabilità')
-        ax.legend()
+        ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1))  # Sposta la legenda ancora più fuori dal grafico
+    
+        # Aggiungi margini laterali per centrare meglio il grafico
+        ax.margins(x=0.2)  # Aggiunge margini laterali sul lato x
+    
+        # Salva il grafico
         file = os.path.join(self.graph_dir, output_filename)
-        plt.savefig(file)
+        plt.savefig(file, bbox_inches='tight')
         plt.close()
+
 
     def create_donut_chart(self, value, label, color, output_filename):
         fig, ax = plt.subplots()

@@ -15,10 +15,6 @@ async def read_users_me(current_user: Annotated[UserInDB, Depends(get_current_us
 
 
 
-
-
-
-
 @router.post("/change-password",
     response_description="Conferma del cambio della password",
     responses={

@@ -184,8 +184,11 @@ export default {
                     link.href = url;
 
                     // Costruisci il nome del file dinamicamente
+            
                     const dateStr = new Date().toISOString().split('T')[0];
-                    const filename = `Report-${this.auditFiltered.type}-${this.auditFiltered.company}-${this.auditFiltered.name}-${dateStr}.docx`;
+                    let filename = this.auditFiltered.name === "" 
+                        ? `Report-Admin-${dateStr}.pdf` 
+                        : `Report-${this.auditFiltered.type}-${this.auditFiltered.company}-${this.auditFiltered.name}-${dateStr}.pdf`;
 
                     // Imposta il nome del file per il download
                     link.setAttribute('download', filename);

@@ -5,7 +5,7 @@
                 <v-card :elevation="1">
                     <v-card-title class="d-flex justify-space-between align-center">
                         <span>{{ company }} - {{ nameApp }}</span>
-                        <v-btn color="primary" @click="printReport">Scarica Documento</v-btn>
+                        <v-btn color="primary" @click="printReport">Stampa Report</v-btn>
                     </v-card-title>
                 </v-card>
             </v-col>
@@ -262,7 +262,7 @@ export default {
 
                     // Costruisci il nome del file dinamicamente
                     const dateStr = new Date().toISOString().split('T')[0];
-                    const filename = `Rechek-${this.auditFiltered.type}-${this.auditFiltered.company}-${this.auditFiltered.name}-${dateStr}.docx`;
+                    const filename = `Rechek-${this.auditFiltered.company}-${this.auditFiltered.name}-${dateStr}.pdf`;
 
                     // Imposta il nome del file per il download
                     link.setAttribute('download', filename);

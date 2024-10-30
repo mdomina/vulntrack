@@ -88,7 +88,7 @@ async def vapt_list_name(audit_filtered: InputPrint, current_user: Annotated[Use
     
     # Percorso completo della cartella di output
     output_folder = os.path.join(os.path.dirname(__file__), '..', 'utility', 'reportCreation', 'output')
-    output_file = os.path.join(output_folder, "output_report_dashboard.docx")
+    output_file = os.path.join(output_folder, "output_report_dashboard.pdf")
     
 
     # Verifica se il campo nome è vuoto, così da stampare l'intera dashboard
@@ -103,7 +103,7 @@ async def vapt_list_name(audit_filtered: InputPrint, current_user: Annotated[Use
         
         # Genera il report
         general_report = GeneralReport(audits)
-        general_report.set_template('dashboard.docx', "output_report_dashboard.docx")
+        general_report.set_template('dashboard.docx', "output_report_dashboard.pdf")
         general_report.run_vapt()
         
     else:
@@ -118,7 +118,7 @@ async def vapt_list_name(audit_filtered: InputPrint, current_user: Annotated[Use
                 'name': audit_filtered.name
             })
             general_report = GeneralReport(audits)
-            general_report.set_template('dashboard.docx', "output_report_dashboard.docx")
+            general_report.set_template('dashboard.docx', "output_report_dashboard.pdf")
             general_report.run_vapt()
             
         else:
@@ -128,10 +128,16 @@ async def vapt_list_name(audit_filtered: InputPrint, current_user: Annotated[Use
                 'name': audit_filtered.name
             })
             general_report = GeneralReport(audits)
-            general_report.set_template('dashboard.docx', "output_report_dashboard.docx")
+            general_report.set_template('dashboard.docx', "output_report_dashboard.pdf")
             general_report.run_vapt()
+
     # Verifica l'esistenza del file prima di restituirlo
     if not os.path.exists(output_file):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Errore nella generazione del report")
+    
     # Restituisci il file come risposta
-    return FileResponse(path=output_file, filename="output_report_dashboard.docx", media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    return FileResponse(
+        path=output_file, 
+        filename="output_report_dashboard.pdf", 
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )

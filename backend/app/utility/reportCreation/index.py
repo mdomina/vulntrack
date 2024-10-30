@@ -7,6 +7,7 @@ import os
 from pymongo import MongoClient
 from collections import Counter
 from collections import defaultdict
+from docx2pdf import convert
 
 class GeneralReport:
     def __init__(self, mongo_data):
@@ -42,6 +43,8 @@ class GeneralReport:
         self.template_path = os.path.join(self.template_dir, template_name)
         self.output_path = os.path.join(self.output_dir, output_name)
 
+
+
     def run_vapt(self):
         
         is_recheck = any(item.get('auditType', '').lower() == 'recheck' for item in self.mongo_data)
@@ -73,11 +76,11 @@ class GeneralReport:
             pie_chart_name = 'pie_chart_vapt.png'
       
         self.vapt_graphs.create_horizontal_bar_chart_name(name_vapt, sizes_vapt, os.path.join(self.graph_dir, 'horizontal_bar_chart_by_name.png'))
-        self.vapt_graphs.create_timeline_chart(
-            ['2023-09-28', '2023-10-16', '2023-11-03', '2023-11-21', '2023-12-09'],
-            [8, 1, 1, 1, 1], [4, 5, 6, 2, 1], [12, 10, 7, 9, 8], [8, 4, 2, 8, 2],
-            os.path.join(self.graph_dir, 'timeline_chart.png')
-        )
+        # self.vapt_graphs.create_timeline_chart(
+        #     ['2023-09-28', '2023-10-16', '2023-11-03', '2023-11-21', '2023-12-09'],
+        #     [8, 1, 1, 1, 1], [4, 5, 6, 2, 1], [12, 10, 7, 9, 8], [8, 4, 2, 8, 2],
+        #     os.path.join(self.graph_dir, 'timeline_chart.png')
+        # )
         self.vapt_graphs.create_pie_chart(severity_names, pie_chart_data, severity_colors, os.path.join(self.graph_dir, pie_chart_name))
         self.vapt_graphs.create_horizontal_bar_chart_months(months, critical, high, medium, low, os.path.join(self.graph_dir, 'horizontal_bar_chart.png'))
         self.vapt_graphs.create_bar_chart_by_category(vuln_type_names, vuln_type_sizes, os.path.join(self.graph_dir, 'bar_chart_by_category.png'))
@@ -85,9 +88,9 @@ class GeneralReport:
         # Creazione di grafici a ciambella per ciascuna severità sia per VAPT che per Recheck
         self.vapt_graphs.create_all_donut_charts(donut_data)
 
-
         # Modifica del documento Word
         self.modify_word_document_with_charts(self.template_path, self.output_path)
+
     def run_recheck(self):
         """Logica per generare il report Recheck."""
         # Estrazione e calcolo dei dati
@@ -104,6 +107,8 @@ class GeneralReport:
         # Modifica del documento Word
         self.modify_word_document_with_charts(self.template_path, self.output_path)
 
+
+
     def modify_word_document_with_charts(self, input_doc_path, output_doc_path):
         """Modifica un documento Word inserendo i grafici generati."""
         doc = Document(input_doc_path)
@@ -113,7 +118,7 @@ class GeneralReport:
         pie_chart_name = 'pie_chart_recheck.png' if is_recheck else 'pie_chart_vapt.png'
 
         # Sostituisce i tag con i grafici specifici
-        self.replace_tag_with_chart(doc, '{{tag_graficotimeline}}', os.path.join(self.graph_dir, 'timeline_chart.png'))
+        # self.replace_tag_with_chart(doc, '{{tag_graficotimeline}}', os.path.join(self.graph_dir, 'timeline_chart.png'))
         self.replace_tag_with_chart(doc, '{{tag_complessive}}', os.path.join(self.graph_dir, pie_chart_name))
         self.replace_tag_with_chart(doc, '{{tag_mensili}}', os.path.join(self.graph_dir, 'horizontal_bar_chart.png'))
         self.replace_tag_with_chart(doc, '{{tag_name}}', os.path.join(self.graph_dir, 'horizontal_bar_chart_by_name.png'))
@@ -128,8 +133,15 @@ class GeneralReport:
         # Inserimento dei grafici a ciambella (donut charts)
         self.replace_tag_with_donut_charts(doc, '{{tag_grafici_donut}}')
 
-        # Salva il documento modificato
-        doc.save(output_doc_path)
+        # Salva il documento modificato come file temporaneo
+        temp_docx_path = "temp_modified_document.docx"
+        doc.save(temp_docx_path)
+
+        # Converte il file temporaneo in PDF
+        convert(temp_docx_path, output_doc_path)
+
+        # Rimuove il file temporaneo
+        os.remove(temp_docx_path)
 
 
 

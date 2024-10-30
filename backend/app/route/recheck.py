@@ -76,18 +76,19 @@ async def recheck_vapt_document(audit_filtered: InputRecheckCompared, current_us
     
     # Percorso completo della cartella di output
     output_folder = os.path.join(os.path.dirname(__file__), '..', 'utility', 'reportCreation', 'output')
-    output_file = os.path.join(output_folder, "output_report_recheck.docx")
-
+    output_file = os.path.join(output_folder, "output_report_recheck.pdf")
+    
     # Controlla il ruolo dell'utente
     if current_user.role == UserRole.USER:
-        audits = mydb.ricerca_filtrata({
-            'company': audit_filtered.company,
-            'name': audit_filtered.name
-        })
-    else:
-        # Se l'utente non è USER, non applichiamo alcun filtro
-        audits = mydb.ricerca_filtrata({})
+        if audit_filtered.company not in current_user.companies:
+            raise  HTTPException(status_code=status.HTTP_403_FORBIDDEN)
 
+
+    audits = mydb.ricerca_filtrata({
+            'company': audit_filtered.company,
+            'name': audit_filtered.name,
+    })
+    
     # Genera il report
     general_report = GeneralReport(audits)
     general_report.set_template('recheck.docx', output_file)
@@ -100,6 +101,6 @@ async def recheck_vapt_document(audit_filtered: InputRecheckCompared, current_us
     # Restituisci il file come risposta
     return FileResponse(
         path=output_file,
-        filename="output_report_recheck.docx",
+        filename="output_report_recheck.pdf",
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     )
