@@ -7,7 +7,7 @@ import os
 from pymongo import MongoClient
 from collections import Counter
 from collections import defaultdict
-from docx2pdf import convert
+import subprocess
 
 class GeneralReport:
     def __init__(self, mongo_data):
@@ -118,7 +118,6 @@ class GeneralReport:
         pie_chart_name = 'pie_chart_recheck.png' if is_recheck else 'pie_chart_vapt.png'
 
         # Sostituisce i tag con i grafici specifici
-        # self.replace_tag_with_chart(doc, '{{tag_graficotimeline}}', os.path.join(self.graph_dir, 'timeline_chart.png'))
         self.replace_tag_with_chart(doc, '{{tag_complessive}}', os.path.join(self.graph_dir, pie_chart_name))
         self.replace_tag_with_chart(doc, '{{tag_mensili}}', os.path.join(self.graph_dir, 'horizontal_bar_chart.png'))
         self.replace_tag_with_chart(doc, '{{tag_name}}', os.path.join(self.graph_dir, 'horizontal_bar_chart_by_name.png'))
@@ -137,10 +136,20 @@ class GeneralReport:
         temp_docx_path = "temp_modified_document.docx"
         doc.save(temp_docx_path)
 
-        # Converte il file temporaneo in PDF
-        convert(temp_docx_path, output_doc_path)
+        # Converte il file temporaneo in PDF utilizzando LibreOffice
+        subprocess.run([
+            'libreoffice', '--headless', '--convert-to', 'pdf', 
+            temp_docx_path, '--outdir', os.path.dirname(output_doc_path)
+        ])
 
-        # Rimuove il file temporaneo
+        # Rinomina il file PDF generato da LibreOffice nella destinazione desiderata
+        temp_pdf_path = os.path.splitext(temp_docx_path)[0] + ".pdf"
+        if os.path.exists(temp_pdf_path):
+            os.rename(temp_pdf_path, output_doc_path)
+        else:
+            raise FileNotFoundError("Conversione fallita, il file PDF non è stato generato.")
+
+        # Rimuove il file temporaneo .docx
         os.remove(temp_docx_path)
 
 
