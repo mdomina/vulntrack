@@ -1,10 +1,8 @@
 from datetime import datetime
 from docx import Document
 from docx.shared import Inches
-from fastapi.responses import FileResponse
 from .DrawGraphs import DrawGraphs, Recheck
 import os
-from pymongo import MongoClient
 from collections import Counter
 from collections import defaultdict
 import subprocess
@@ -108,11 +106,10 @@ class GeneralReport:
         self.modify_word_document_with_charts(self.template_path, self.output_path)
 
 
-
     def modify_word_document_with_charts(self, input_doc_path, output_doc_path):
         """Modifica un documento Word inserendo i grafici generati."""
         doc = Document(input_doc_path)
-        
+
         # Determina se il tipo di audit è Recheck o VAPT
         is_recheck = any(item.get('auditType', '').lower() == 'recheck' for item in self.mongo_data)
         pie_chart_name = 'pie_chart_recheck.png' if is_recheck else 'pie_chart_vapt.png'
@@ -122,13 +119,13 @@ class GeneralReport:
         self.replace_tag_with_chart(doc, '{{tag_mensili}}', os.path.join(self.graph_dir, 'horizontal_bar_chart.png'))
         self.replace_tag_with_chart(doc, '{{tag_name}}', os.path.join(self.graph_dir, 'horizontal_bar_chart_by_name.png'))
         self.replace_tag_with_chart(doc, '{{tag_categoria}}', os.path.join(self.graph_dir, 'bar_chart_by_category.png'))
-        
+
         # Grafici per il riepilogo Recheck
         self.replace_tag_with_chart(doc, '{{tag_recheck_summary}}', os.path.join(self.graph_dir, 'recheck_summary.png'))
         self.replace_tag_with_chart(doc, '{{tag_vapt_recheck}}', os.path.join(self.graph_dir, 'vapt_recheck_summary.png'))
         self.replace_tag_with_chart(doc, '{{tag_vapt_recheck_histogram}}', os.path.join(self.graph_dir, 'vapt_recheck_histogram.png'))
         self.replace_tag_with_chart(doc, '{{tag_vuln_by_name}}', os.path.join(self.graph_dir, 'vuln_histogram_by_name.png'))
-        
+
         # Inserimento dei grafici a ciambella (donut charts)
         self.replace_tag_with_donut_charts(doc, '{{tag_grafici_donut}}')
 
@@ -136,14 +133,16 @@ class GeneralReport:
         temp_docx_path = "temp_modified_document.docx"
         doc.save(temp_docx_path)
 
-        # Converte il file temporaneo in PDF utilizzando LibreOffice
+        # Converte il documento modificato in PDF usando LibreOffice
         subprocess.run([
-            'libreoffice', '--headless', '--convert-to', 'pdf', 
+            '/usr/bin/libreoffice', '--headless', '--convert-to', 'pdf',
             temp_docx_path, '--outdir', os.path.dirname(output_doc_path)
         ])
 
         # Rinomina il file PDF generato da LibreOffice nella destinazione desiderata
         temp_pdf_path = os.path.splitext(temp_docx_path)[0] + ".pdf"
+        temp_pdf_path = os.path.join(os.path.dirname(output_doc_path), temp_pdf_path)
+
         if os.path.exists(temp_pdf_path):
             os.rename(temp_pdf_path, output_doc_path)
         else:
@@ -151,7 +150,6 @@ class GeneralReport:
 
         # Rimuove il file temporaneo .docx
         os.remove(temp_docx_path)
-
 
 
 

@@ -1,16 +1,16 @@
 version: '3.8'
 
 services:
-  vulntrack_backend:
-    build: ./backend/
-    image: vulntrack/backend:1.0
-    container_name: vulntrack_backend
-    restart: always
-    ports:
-      - 8000:80
-    environment:
-      - MONGODB_HOST=172.31.41.88
-      - MONGODB_PORT=27017
+  # vulntrack_backend:
+  #   build: ./backend/
+  #   image: vulntrack/backend:1.0
+  #   container_name: vulntrack_backend
+  #   restart: always
+  #   ports:
+  #     - 8000:80
+  #   environment:
+  #     - MONGODB_HOST=172.31.41.88
+  #     - MONGODB_PORT=27017
     
   vulntrack_frontend:
     build: ./frontend/

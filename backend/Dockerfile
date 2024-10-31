@@ -6,6 +6,13 @@ COPY . /root/
 # Imposta la directory di lavoro
 WORKDIR /root/
 
+# Installa LibreOffice e dipendenze
+RUN apt-get update && apt-get install -y \
+    libreoffice \
+    libreoffice-core \
+    libreoffice-writer \
+    && apt-get clean
+    
 # Installa python3-pip e le dipendenze del progetto
 # e rendi eseguibile lo script di avvio
 RUN chmod +x install_python3.10.sh && \
