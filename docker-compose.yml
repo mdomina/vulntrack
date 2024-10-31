@@ -9,10 +9,8 @@ services:
     ports:
       - 8000:80
     environment:
-      - MONGODB_HOST=vuln_db
+      - MONGODB_HOST=172.31.41.88
       - MONGODB_PORT=27017
-    networks:
-      - pwndoc_backend
     
   vulntrack_frontend:
     build: ./frontend/
@@ -21,10 +19,3 @@ services:
     restart: always
     ports:
       - 8080:80
-    
-
-networks:
-  pwndoc_backend:
-    driver: bridge
-    name: pwndoc_backend
-    external: true

@@ -13,6 +13,6 @@ RUN chmod +x install_python3.10.sh && \
     python3.10 -m venv venv && \
     ./venv/bin/pip install -r requirements.txt && \
     chmod +x boot.sh
-
+RUN ls /root
 # Imposta lo script di avvio come entrypoint
 ENTRYPOINT ["./boot.sh"]

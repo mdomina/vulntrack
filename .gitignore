@@ -1,0 +1,5 @@
+# Ignora tutto nella cartella frontend
+frontend/*
+
+# Mantieni il Dockerfile nella cartella frontend
+!frontend/Dockerfile
