@@ -1,5 +1,21 @@
 <template>
     <v-container fluid class="down-top-padding">
+        <!-- quando viene avviato il download del report compare la barra di progressione -->
+        <v-dialog v-model="loadingReport" hide-overlay persistent width="300">
+            <v-card color="primary" dark>
+                <v-card-title></v-card-title>
+                <v-card-text class="d-flex justify-center">
+                    <v-progress-circular :value="downloadProgress" color="white" size="70" width="7">
+                        {{ downloadProgress }}%
+                    </v-progress-circular>
+                </v-card-text>
+                <v-card-actions class="justify-center">
+                    <span>Generazione del report in corso...</span>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+
         <v-row>
             <v-col cols="12">
                 <v-btn color="primary" dark @click="stampaReport">
@@ -146,7 +162,9 @@ export default {
             "company": "",
             "name":"",
             "type":""
-        }
+        },
+        loadingReport: false , // Variabile per lo stato di caricamento
+        downloadProgress: 0     // Stato di avanzamento del download
     }),
     methods: {
         ...mapActions(
@@ -172,39 +190,49 @@ export default {
             this.getDataRemediation();
         },
         stampaReport() {
+            this.loadingReport = true;
+            this.downloadProgress = 0;
+
+            // Simulatore di progresso
+            const interval = setInterval(() => {
+                if (this.downloadProgress < 90) {  // Limita al 90% fino alla risposta
+                    this.downloadProgress += 1;
+                }
+            }, 100);
+
             const urlBackend = process.env.VUE_APP_VAPT_PRINT_DASHBOARD;
 
             axios.post(urlBackend, this.auditFiltered, { responseType: 'blob' })
                 .then((response) => {
-                    // Crea un URL temporaneo per il blob
                     const url = window.URL.createObjectURL(new Blob([response.data]));
-
-                    // Crea un elemento <a> per scaricare il file
                     const link = document.createElement('a');
                     link.href = url;
 
-                    // Costruisci il nome del file dinamicamente
-            
                     const dateStr = new Date().toISOString().split('T')[0];
                     let filename = this.auditFiltered.name === "" 
                         ? `Report-Admin-${dateStr}.pdf` 
                         : `Report-${this.auditFiltered.type}-${this.auditFiltered.company}-${this.auditFiltered.name}-${dateStr}.pdf`;
 
-                    // Imposta il nome del file per il download
                     link.setAttribute('download', filename);
-
-                    // Aggiungi l'elemento <a> al DOM e attiva il click
                     document.body.appendChild(link);
                     link.click();
-
-                    // Rimuovi l'elemento <a> e libera l'URL temporaneo
                     document.body.removeChild(link);
                     window.URL.revokeObjectURL(url);
                 })
                 .catch((error) => {
                     console.error("Errore nel download del report:", error);
+                })
+                .finally(() => {
+                    clearInterval(interval);
+                    this.downloadProgress = 100;  // Imposta a 100% alla fine del download
+                    setTimeout(() => {
+                        this.loadingReport = false;
+                        this.downloadProgress = 0;  // Reset del progresso dopo qualche secondo
+                    }, 500);
                 });
         }
+
+
 
 
 },
