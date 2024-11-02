@@ -33,7 +33,7 @@ class Dashboard:
         
         # Determina il numero di etichette e calcola l'altezza della figura se i nomi delle vulnerabilità sono magiorni di 
         if len(labels) > 15:
-            fig_height = max(1, len(labels) * 0.5)  # Imposta l'altezza in base al numero di etichette
+            fig_height = max(1, len(labels) * 0.2)  # Imposta l'altezza in base al numero di etichette
         else:
             fig_height = 8
             
@@ -44,8 +44,7 @@ class Dashboard:
         ax.barh(labels, sizes, color='skyblue', height=0.5)
 
         # Configura la dimensione dei tick delle etichette sull'asse y per migliorare la leggibilità
-        if len(labels) > 15:
-            ax.tick_params(axis='y', labelsize=8)
+        ax.tick_params(axis='y', labelsize=10)
 
         # imposta il margine verticale tra il bordo e le barre se  i nomi delle vulnerabilità sono maggiori di 
         if len(labels) > 10:
