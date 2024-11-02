@@ -135,7 +135,6 @@ async def vapt_list_name(audit_filtered: InputPrint, current_user: Annotated[Use
             general_report.run_vapt()
 
     # Verifica l'esistenza del file prima di restituirlo
-    print(output_file)
     if not os.path.exists(output_file):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Errore nella generazione del report")
     

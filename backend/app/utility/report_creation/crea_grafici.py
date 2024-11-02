@@ -18,16 +18,47 @@ class Dashboard:
         if not os.path.exists(self.graph_dir):
             os.makedirs(self.graph_dir)
 
-    def create_horizontal_bar_chart_name(self, labels, sizes, output_filename):
-        fig, ax = plt.subplots(figsize=(10, 8))
+    def horizontal_bar_chart_by_name(self, labels, sizes, output_filename):
+        """
+        Crea un grafico a barre orizzontali per visualizzare i dati basati su nomi specifici.
+
+        Questa funzione genera un grafico a barre orizzontali, con ciascuna barra che rappresenta
+        il numero associato a una specifica etichetta. Il grafico è salvato come file immagine
+        nella directory specificata.
+
+        :param labels: Lista di etichette per ciascuna barra del grafico.
+        :param sizes: Lista di valori numerici che determinano la lunghezza di ciascuna barra.
+        :param output_filename: Nome del file in cui salvare il grafico generato.
+        """
+        
+        # Determina il numero di etichette e calcola l'altezza della figura se i nomi delle vulnerabilità sono magiorni di 
+        if len(labels) > 15:
+            fig_height = max(1, len(labels) * 0.5)  # Imposta l'altezza in base al numero di etichette
+        else:
+            fig_height = 8
+            
+        # Crea una figura con altezza dinamica e larghezza fissa
+        fig, ax = plt.subplots(figsize=(11, fig_height))
+
+        # Disegna le barre orizzontali usando le etichette e le dimensioni fornite
         ax.barh(labels, sizes, color='skyblue', height=0.5)
-        ax.set_xlabel('Numero di Vulnerabilità')
-        ax.set_ylabel('Nome Vulnerabilità')
-        ax.tick_params(axis='y', labelsize=8)
+
+        # Configura la dimensione dei tick delle etichette sull'asse y per migliorare la leggibilità
+        if len(labels) > 15:
+            ax.tick_params(axis='y', labelsize=8)
+
+        # imposta il margine verticale tra il bordo e le barre se  i nomi delle vulnerabilità sono maggiori di 
+        if len(labels) > 10:
+            ax.margins(y=0.01) 
+        
+        # Applica un layout compatto per ridurre gli spazi bianchi
         plt.tight_layout()
+
+        # Salva il grafico come immagine nel percorso specificato
         file = os.path.join(self.graph_dir, output_filename)
         plt.savefig(file)
-        plt.close()
+        plt.close()  # Chiude la figura per liberare memoria
+
 
     # def create_timeline_chart(self, dates, critical, high, medium, low, output_filename):
     #     dates = [datetime.strptime(date, '%Y-%m-%d') for date in dates]
@@ -99,7 +130,7 @@ class Dashboard:
         fig, ax = plt.subplots()
         ax.bar(labels, sizes, color='skyblue', width=0.2)
         ax.set_xlim(-0.5, len(labels) - 0.5)
-        ax.set_ylabel('Numero di Vulnerabilità')
+        # ax.set_ylabel('Numero di Vulnerabilità')
         plt.xticks(rotation=45, ha='right')
         plt.tight_layout()
         file = os.path.join(self.graph_dir, output_filename)
@@ -116,7 +147,7 @@ class Dashboard:
         ax.barh(categories, medium, left=[i + j for i, j in zip(critical, high)], label='Media', color='orange', height=bar_height)
         ax.barh(categories, low, left=[i + j + k for i, j, k in zip(critical, high, medium)], label='Bassa', color='green', height=bar_height)
         # Aggiungi etichette e legenda
-        ax.set_xlabel('Numero di Vulnerabilità')
+        # ax.set_xlabel('Numero di Vulnerabilità')
         ax.legend(loc='upper right', bbox_to_anchor=(1.3, 1))  # Sposta la legenda ancora più fuori dal grafico
     
         # Aggiungi margini laterali per centrare meglio il grafico
@@ -151,7 +182,7 @@ class Dashboard:
         ax.bar(categories, high, label='Alta', color='orange', bottom=[medium[j] + low[j] for j in range(len(categories))])
         ax.bar(categories, medium, label='Media', color='yellow', bottom=low)
         ax.bar(categories, low, label='Bassa', color='green')
-        ax.set_ylabel('Numero di Vulnerabilità')
+        # ax.set_ylabel('Numero di Vulnerabilità')
         ax.legend()
         file = os.path.join(self.graph_dir, output_filename)
         plt.savefig(file)

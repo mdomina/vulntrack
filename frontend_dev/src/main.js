@@ -22,7 +22,7 @@ axios.interceptors.request.use((config) => {
    return Promise.reject(error);
 });
 
-/*axios.interceptors.response.use((response) => {
+axios.interceptors.response.use((response) => {
     return response;
 }, (error) => {
     if (error.response.status === 401) {
@@ -32,7 +32,7 @@ axios.interceptors.request.use((config) => {
     }
 
     return Promise.reject(error);
-});*/
+})
 
 // NOTIFICHE
 // import Toasted from 'vue-toasted';
