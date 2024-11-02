@@ -1,7 +1,7 @@
 from datetime import datetime
 from docx import Document
 from docx.shared import Inches
-from .DrawGraphs import DrawGraphs, Recheck
+from app.utility.report_creation.crea_grafici import Dashboard, Recheck
 import os
 from collections import Counter
 from collections import defaultdict
@@ -15,7 +15,7 @@ class GeneralReport:
         self.template_dir = os.path.join(base_dir, 'template')
 
         self.controllo_cartelle()
-        self.vapt_graphs = DrawGraphs()  
+        self.vapt_graphs = Dashboard()  
         self.recheck = Recheck()       
         self.mongo_data = mongo_data
     
@@ -28,19 +28,11 @@ class GeneralReport:
             os.makedirs(self.output_dir)
         if not os.path.exists(self.template_dir):
             os.makedirs(self.template_dir)
-
-        # def get_data_from_mongo(self):
-        #     """Ottieni i dati dalla collezione MongoDB."""
-        #     client = MongoClient('mongodb://10.0.0.21:27017/')
-        #     db = client['vulntrack']
-        #     collection = db['vapt']
-        #     return list(collection.find())
     
     def set_template(self, template_name, output_name):
         """Imposta i percorsi del template e del file di output."""
         self.template_path = os.path.join(self.template_dir, template_name)
         self.output_path = os.path.join(self.output_dir, output_name)
-
 
 
     def run_vapt(self):
@@ -105,7 +97,6 @@ class GeneralReport:
         # Modifica del documento Word
         self.modify_word_document_with_charts(self.template_path, self.output_path)
 
-
     def modify_word_document_with_charts(self, input_doc_path, output_doc_path):
         """Modifica un documento Word inserendo i grafici generati."""
         doc = Document(input_doc_path)
@@ -150,8 +141,6 @@ class GeneralReport:
 
         # Rimuove il file temporaneo .docx
         os.remove(temp_docx_path)
-
-
 
     def replace_tag_with_chart(self, doc, tag, image_path, image_width=Inches(5)):
         """Sostituisce un tag nel documento con un'immagine del grafico."""

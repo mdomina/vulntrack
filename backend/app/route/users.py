@@ -98,11 +98,8 @@ async def change_password(
     if not bcrypt.checkpw(password_data.old_password.encode('utf-8'), current_user.password.encode('utf-8')):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Password errata")
 
-    # Cifra la nuova password e aggiorna nel database
-    hashed_password = bcrypt.hashpw(password_data.new_password.strip().encode('utf-8'), bcrypt.gensalt())
-
     # Assuming current_user has an attribute `_id` which is the user's ID
-    success = mydb.update_user_password(current_user.email, hashed_password.decode('utf-8'))
+    success = mydb.update_user_password(current_user.email, password_data.new_password)
 
     if not success:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Errore durante l'aggiornamento della password")

@@ -1,12 +1,11 @@
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 import os
-from datetime import datetime
 
-class DrawGraphs:
+class Dashboard:
+    """classe per creare grafici dalla pagina web dashboard generale"""
     def __init__(self, base_dir=None):
         """
-        Costruttore per DrawGraphs che configura le directory.
+        Costruttore per Dashboard che configura le directory.
         
         :param base_dir: Directory di base in cui vengono salvati i grafici. 
                          Se None, viene utilizzata la directory corrente.
@@ -47,29 +46,54 @@ class DrawGraphs:
 
 
     def create_pie_chart(self, labels, sizes, colors, output_filename):
+        """
+        Crea un grafico a torta con spazi tra le sezioni per rappresentare i dati.
+
+        Questa funzione genera un grafico a torta basato sulle etichette, dimensioni e colori forniti.
+        Le sezioni del grafico sono distanziate per migliorare la leggibilità. Gli elementi con size=0
+        vengono filtrati per evitare sezioni non visibili.
+
+        :param labels: Lista di etichette per ciascuna sezione del grafico.
+        :param sizes: Lista di dimensioni per ciascuna sezione del grafico.
+        :param colors: Lista di colori per ciascuna sezione del grafico.
+        :param output_filename: Nome del file in cui salvare il grafico generato.
+        """
+        
         # Filtra le etichette e le dimensioni per rimuovere gli elementi con size = 0
+        # Questo evita di avere sezioni vuote nel grafico
         filtered_labels = [label for label, size in zip(labels, sizes) if size > 0]
         filtered_sizes = [size for size in sizes if size > 0]
         filtered_colors = [color for color, size in zip(colors, sizes) if size > 0]
+        
+        # Crea la lista explode per aggiungere spazio tra le sezioni
+        # Ogni elemento nella lista rappresenta lo "spostamento" di una sezione dal centro del grafico
+        # 0.1 significa che ogni sezione viene spostata leggermente per creare spazio
+        explode = [0.01] * len(filtered_sizes)
+
+        # Crea una nuova figura e un asse per il grafico a torta
         fig, ax = plt.subplots()
 
-        # Funzione per mostrare solo le percentuali maggiori di zero
+        # Funzione personalizzata per mostrare le percentuali solo per le sezioni con valore > 0
+        # Se una percentuale è 0, non viene mostrata sul grafico
         def autopct_format(pct):
             return ('%1.1f%%' % pct) if pct > 0 else ''
 
+        # Crea il grafico a torta
         ax.pie(
-            filtered_sizes, 
-            labels=filtered_labels, 
-            autopct=autopct_format,  # Usa la funzione personalizzata
-            startangle=90, 
-            colors=filtered_colors
+            filtered_sizes,                # Utilizza solo le dimensioni filtrate
+            labels=filtered_labels,         # Utilizza solo le etichette filtrate
+            autopct=autopct_format,         # Usa la funzione personalizzata per le percentuali
+            startangle=90,                  # Avvia il grafico a torta a 90 gradi (in alto)
+            colors=filtered_colors,         # Usa solo i colori filtrati
+            explode=explode                 # Crea spazio tra le sezioni
         )
-        ax.axis('equal')  # Per fare in modo che il grafico sia un cerchio
+        ax.axis('equal')  # Imposta l'asse per mantenere il grafico come un cerchio perfetto
 
-        # Salva il grafico
+        # Salva il grafico come immagine nel percorso specificato
         file = os.path.join(self.graph_dir, output_filename)
         plt.savefig(file)
-        plt.close()
+        plt.close()  # Chiudi la figura per liberare memoria
+
 
     def create_bar_chart_by_category(self, labels, sizes, output_filename):
         fig, ax = plt.subplots()
@@ -135,6 +159,7 @@ class DrawGraphs:
 
 
 class Recheck:
+    """classe per creare grafici per la pagina web del confronto tra vap e recheck"""
     def __init__(self, base_dir=None):
         """
         Costruttore per la classe Recheck che configura la directory per il salvataggio dei grafici.

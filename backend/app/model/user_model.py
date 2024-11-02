@@ -129,5 +129,5 @@ class ChangePasswordModel(BaseModel):
         if not re.search(r'[A-Z]', v):
             raise ValueError('La password deve contenere almeno una lettera maiuscola')
         
-        # Ritorna il valore della password validata se tutti i controlli sono passati
-        return v
+        hash_password = HashPassword()
+        return hash_password.hash_password(v)

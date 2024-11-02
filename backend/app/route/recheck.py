@@ -6,7 +6,7 @@ from app.utility.format_rechecks import filter_rechecks
 from app.utility.mapping_vulnerability import MappingVulnerability
 from app.utility.users import get_current_user
 from app.model.user_model import UserInDB, UserRole
-from app.utility.reportCreation.index import GeneralReport
+from app.utility.report_creation.index import GeneralReport
 from fastapi.responses import FileResponse
 import os
 
@@ -74,8 +74,11 @@ async def recheck_vapt_document(audit_filtered: InputRecheckCompared, current_us
     """Endpoint per stampare il report"""
     mydb = MyDB()
     
-    # Percorso completo della cartella di output
-    output_folder = os.path.join(os.path.dirname(__file__), '..', 'utility', 'reportCreation', 'output')
+    # Ottieni la directory di lavoro corrente (quella da cui è stato avviato FastAPI)
+    current_working_directory = os.getcwd()
+
+    # Costruisci il percorso assoluto per la cartella "output"
+    output_folder = os.path.join(current_working_directory, 'app', 'utility', 'report_creation', 'output')
     output_file = os.path.join(output_folder, "output_report_recheck.pdf")
     
     # Controlla il ruolo dell'utente
