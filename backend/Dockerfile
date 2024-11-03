@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM python:3.10-slim
 
 # Copia i file nel container
 COPY . /root/
@@ -13,13 +13,19 @@ RUN apt-get update && apt-get install -y \
     libreoffice-writer \
     && apt-get clean
     
-# Installa python3-pip e le dipendenze del progetto
-# e rendi eseguibile lo script di avvio
-RUN chmod +x install_python3.10.sh && \
-    ./install_python3.10.sh && \
-    python3.10 -m venv venv && \
-    ./venv/bin/pip install -r requirements.txt && \
-    chmod +x boot.sh
-RUN ls /root
+# Rende eseguibile lo script di installazione di Python 3.10
+# RUN chmod +x install_python3.10.sh
+
+# Esegue lo script per installare Python 3.10
+# RUN ./install_python3.10.sh
+
+# Crea un ambiente virtuale con Python 3.10
+# RUN python3.10 -m venv venv
+
+# Installa le dipendenze nel virtual environment
+RUN pip install -r requirements.txt
+
+RUN chmod +x boot.sh
+
 # Imposta lo script di avvio come entrypoint
 ENTRYPOINT ["./boot.sh"]

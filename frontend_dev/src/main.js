@@ -9,9 +9,13 @@ import 'vue-toastification/dist/index.css'; //importa i css
 
 // AXIOS
 import axios from 'axios';
-//dev
+import https from 'https';
+
+// Configura axios per ignorare i certificati autofirmati
 axios.defaults.baseURL = process.env.VUE_APP_BASE_URL;
-//prod
+axios.defaults.httpsAgent = new https.Agent({ rejectUnauthorized: false });
+
+// Intercettore delle richieste
 axios.interceptors.request.use((config) => {
    let token = localStorage.getItem('token');
    if (token) {
