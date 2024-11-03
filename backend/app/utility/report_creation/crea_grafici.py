@@ -259,15 +259,15 @@ class Recheck:
         # VAPT Histogram
         axs[0].barh(categories, data_vapt, color='skyblue')
         axs[0].set_title('VAPT', fontsize=16, fontweight='bold')
-        axs[0].set_xlabel('Numero di Vulnerabilità')
-        axs[0].set_ylabel('Tipologia')
+        #axs[0].set_xlabel('Numero di Vulnerabilità')
+        #axs[0].set_ylabel('Tipologia')
         axs[0].invert_yaxis()
 
         # Recheck Histogram
-        axs[1].barh(categories, data_recheck, color='lightcoral')
+        axs[1].barh(categories, data_recheck, color='skyblue')
         axs[1].set_title('Recheck', fontsize=16, fontweight='bold')
-        axs[1].set_xlabel('Numero di Vulnerabilità')
-        axs[1].set_ylabel('Tipologia')
+        # axs[1].set_xlabel('Numero di Vulnerabilità')
+        # axs[1].set_ylabel('Tipologia')
         axs[1].invert_yaxis()
 
         file = os.path.join(self.graph_dir, output_filename)
@@ -280,17 +280,17 @@ class Recheck:
 
         # VAPT Vulnerability Histogram
         axs[0].barh(labels_vapt, sizes_vapt, color='skyblue')
-        axs[0].set_title('VAPT', fontsize=fontsize + 2)
-        axs[0].set_xlabel('Numero di Vulnerabilità', fontsize=fontsize)
-        axs[0].set_ylabel('Nome della Vulnerabilità', fontsize=fontsize)
-        axs[0].tick_params(axis='y', labelsize=fontsize)
+        axs[0].set_title('VAPT', fontsize=16, fontweight='bold')
+        # 
+        # xs[0].set_ylabel('Nome della Vulnerabilità', fontsize=fontsize)
+        # axs[0].tick_params(axis='y', labelsize=fontsize)
 
         # Recheck Vulnerability Histogram
-        axs[1].barh(labels_recheck, sizes_recheck, color='lightgreen')
-        axs[1].set_title('Recheck', fontsize=fontsize + 2)
-        axs[1].set_xlabel('Numero di Vulnerabilità', fontsize=fontsize)
-        axs[1].set_ylabel('Nome della Vulnerabilità', fontsize=fontsize)
-        axs[1].tick_params(axis='y', labelsize=fontsize)
+        axs[1].barh(labels_recheck, sizes_recheck, color='skyblue')
+        axs[1].set_title('Recheck', fontsize=16, fontweight='bold')
+        # axs[1].set_xlabel('Numero di Vulnerabilità', fontsize=fontsize)
+        # axs[1].set_ylabel('Nome della Vulnerabilità', fontsize=fontsize)
+        # axs[1].tick_params(axis='y', labelsize=fontsize)
 
         plt.subplots_adjust(left=0.3)
         file = os.path.join(self.graph_dir, output_file)

@@ -37,8 +37,7 @@ class ModificaTemplate:
                 paragraph.text = ''
                 # Imposta la larghezza dell'immagine in modo che occupi tutta la larghezza disponibile
                 paragraph.add_run().add_picture(image_path, width=available_width)
-
-    
+ 
     def replace_tag_with_donut_charts(self, doc:DocumentObject, tag:str):
         """Sostituisce un tag con una tabella contenente i grafici a ciambella."""
         for paragraph in doc.paragraphs:
