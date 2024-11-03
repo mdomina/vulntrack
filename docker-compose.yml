@@ -6,8 +6,8 @@ services:
     image: vulntrack/backend:1.0
     container_name: vulntrack_backend
     restart: always
-    ports:
-      - 80
+    # ports:
+    #   - 80
     environment:
       - MONGODB_HOST=172.31.41.88
       - MONGODB_PORT=27017
@@ -17,8 +17,8 @@ services:
     image: vulntrack/frontend:1.0
     container_name: vulntrack_frontend
     restart: always
-    ports:
-      - 8080:80
+    # ports:
+    #   - 8080:80
   
   nginx_proxy:
     image: nginx:latest
