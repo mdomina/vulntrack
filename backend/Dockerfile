@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM python:3.10-slim
 
 # Copia i file nel container
 COPY . /root/
@@ -6,12 +6,19 @@ COPY . /root/
 # Imposta la directory di lavoro
 WORKDIR /root/
 
-# Installa python3-pip e le dipendenze del progetto
-# e rendi eseguibile lo script di avvio
-RUN apt-get update && \
-    apt-get install -y python3-pip && \
-    pip3 install --no-cache-dir -r requirements.txt && \
-    chmod +x boot.sh
+# Installa LibreOffice e dipendenze
+RUN apt-get update && apt-get install -y \
+    libreoffice \
+    libreoffice-core \
+    libreoffice-writer \
+    && apt-get clean
+
+# Installa le dipendenze nel virtual environment
+RUN pip install -r requirements.txt
+
+RUN chmod +x boot.sh
+
+EXPOSE 80
 
 # Imposta lo script di avvio come entrypoint
 ENTRYPOINT ["./boot.sh"]

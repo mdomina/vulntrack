@@ -6,25 +6,31 @@ services:
     image: vulntrack/backend:1.0
     container_name: vulntrack_backend
     restart: always
-    ports:
-      - 8000:80
     environment:
-      - MONGODB_HOST=vuln_db
+      - MONGODB_HOST=172.31.41.88
       - MONGODB_PORT=27017
-    networks:
-      - pwndoc_backend
-    
+      - PWNDOC_HOST=172.31.41.88
+      - PWNDOC_PORT=27017
+  
   vulntrack_frontend:
-    build: ./frontend/
+    build:
+      context: ./frontend/
+      args:
+        VUE_APP_BACKEND_URL: "https://192.168.204.129/api"
     image: vulntrack/frontend:1.0
     container_name: vulntrack_frontend
     restart: always
+  
+  nginx_proxy:
+    image: nginx:latest
+    container_name: nginx_proxy
+    restart: always
     ports:
-      - 8080:80
-    
-
-networks:
-  pwndoc_backend:
-    driver: bridge
-    name: pwndoc_backend
-    external: true
+      - 443:443
+      - 80:80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/certs:/etc/nginx/certs
+    depends_on:
+      - vulntrack_frontend
+      - vulntrack_backend

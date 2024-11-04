@@ -1,0 +1,6 @@
+# Ignora tutto nella cartella frontend
+frontend/*
+
+# Mantieni il Dockerfile e nginx.conf nella cartella frontend
+!frontend/Dockerfile
+!frontend/nginx.conf
