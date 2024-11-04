@@ -12,7 +12,7 @@ class MyDB():
         mongo_host = settings.MONGO_HOST
         mongo_port = int(settings.MONGO_PORT)
         self.client = MongoClient(mongo_host, mongo_port)
-        self.db = self.client['vulntrack_test']
+        self.db = self.client['vulntrack']
         self.collection_vapt = self.db['vapt']
         self.collection_users = self.db['users']
 
