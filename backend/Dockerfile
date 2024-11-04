@@ -12,20 +12,13 @@ RUN apt-get update && apt-get install -y \
     libreoffice-core \
     libreoffice-writer \
     && apt-get clean
-    
-# Rende eseguibile lo script di installazione di Python 3.10
-# RUN chmod +x install_python3.10.sh
-
-# Esegue lo script per installare Python 3.10
-# RUN ./install_python3.10.sh
-
-# Crea un ambiente virtuale con Python 3.10
-# RUN python3.10 -m venv venv
 
 # Installa le dipendenze nel virtual environment
 RUN pip install -r requirements.txt
 
 RUN chmod +x boot.sh
+
+EXPOSE 80
 
 # Imposta lo script di avvio come entrypoint
 ENTRYPOINT ["./boot.sh"]
