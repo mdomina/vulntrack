@@ -7,16 +7,16 @@ services:
     container_name: vulntrack_backend
     restart: always
     environment:
-      - MONGODB_HOST=172.31.41.88
-      - MONGODB_PORT=27017
-      - PWNDOC_HOST=172.31.41.88
-      - PWNDOC_PORT=27017
+      - MONGODB_HOST=mongo-host
+      - MONGODB_PORT=mongo-port
+      - PWNDOC_HOST=pwndoc-mongo-host
+      - PWNDOC_PORT=pwdoc-mongo-port
   
   vulntrack_frontend:
     build:
       context: ./frontend/
       args:
-        VUE_APP_BACKEND_URL: "https://192.168.204.129/api"
+        VUE_APP_BACKEND_URL: "https://backend-ip/api"
     image: vulntrack/frontend:1.0
     container_name: vulntrack_frontend
     restart: always
