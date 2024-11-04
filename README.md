@@ -71,14 +71,14 @@ vulntrack_frontend:
     - MONGODB_PORT=
   ```
 
-- `PWNDOC_HOST`: Indirizzo IP o hostname di PwnDoc per l'integrazione, impostato nel `docker-compose.yml` con:
+- `PWNDOC_HOST`: Indirizzo IP o hostname del database di PwnDoc per l'integrazione, impostato nel `docker-compose.yml` con:
   
   ```yaml
   environment:
     - PWNDOC_HOST=
   ```
 
-- `PWNDOC_PORT`: Porta utilizzata per il collegamento a PwnDoc, impostata nel `docker-compose.yml` con:
+- `PWNDOC_PORT`: Porta utilizzata dal database di PwnDoc, impostata nel `docker-compose.yml` con:
   
   ```yaml
   environment:
