@@ -38,6 +38,7 @@ class GeneralReport:
         """Imposta i percorsi del template e del file di output."""
         self.template_path = os.path.join(self.template_dir, template_name)
         self.output_path = os.path.join(self.output_dir, output_name)
+    
 
     def run_vapt(self):
         
@@ -48,7 +49,6 @@ class GeneralReport:
         name_vapt, sizes_vapt, vuln_type_names, vuln_type_sizes, severity_names, severity_sizes = get_vuln_data_from_mongo(self.mongo_data)
         months, critical, high, medium, low = get_vuln_data_by_month(self.mongo_data)
         vapt_data, recheck_data = get_vuln_data_for_vapt_and_recheck(self.mongo_data)  # Ottieni sia vapt_data che recheck_data
-        severity_colors = ['brown', 'red', 'orange', 'green']  # I colori per ciascuna severità
         # Definizione della mappa colori per i grafici a ciambella
         severity_color_map = {
             'Critical': 'brown',
@@ -56,6 +56,12 @@ class GeneralReport:
             'Medium': 'orange',
             'Low': 'green'
         }
+        # Modifica del documento Word
+        mt = ModificaTemplate(
+            self.template_path, 
+            self.output_path,
+            self.graph_dir,
+            )
         
         if is_recheck:
             donut_data = [(count, severity, severity_color_map.get(severity, 'grey'), f'{severity.lower()}.png') 
@@ -68,26 +74,32 @@ class GeneralReport:
                         for severity, count in zip(severity_names, vapt_data.values())]
             pie_chart_data = list(vapt_data.values())
             pie_chart_name = 'pie_chart_vapt.png'
-      
-        self.vapt_graphs.horizontal_bar_chart_by_name(name_vapt, sizes_vapt, os.path.join(self.graph_dir, 'horizontal_bar_chart_by_name.png'))
-        # self.vapt_graphs.create_timeline_chart(
-        #     ['2023-09-28', '2023-10-16', '2023-11-03', '2023-11-21', '2023-12-09'],
-        #     [8, 1, 1, 1, 1], [4, 5, 6, 2, 1], [12, 10, 7, 9, 8], [8, 4, 2, 8, 2],
-        #     os.path.join(self.graph_dir, 'timeline_chart.png')
-        # )
-        self.vapt_graphs.create_pie_chart(severity_names, pie_chart_data, severity_colors, os.path.join(self.graph_dir, pie_chart_name))
-        self.vapt_graphs.create_horizontal_bar_chart_months(months, critical, high, medium, low, os.path.join(self.graph_dir, 'horizontal_bar_chart.png'))
-        self.vapt_graphs.create_bar_chart_by_category(vuln_type_names, vuln_type_sizes, os.path.join(self.graph_dir, 'bar_chart_by_category.png'))
 
         # Creazione di grafici a ciambella per ciascuna severità sia per VAPT che per Recheck
         self.vapt_graphs.create_all_donut_charts(donut_data)
+        mt.replace_tag_with_donut_charts('{{tag_grafici_donut}}')
 
-        # Modifica del documento Word
-        mt = ModificaTemplate(
-            self.template_path, 
-            self.output_path,
-            self.graph_dir,
-            )
+        # vuln totali
+        path_chart_totali = os.path.join(self.graph_dir, pie_chart_name)
+        self.vapt_graphs.total_vuln_donut_chart(severity_names, pie_chart_data, path_chart_totali)
+        mt.replace_tag_with_chart('{{tag_complessive}}', path_chart_totali)
+
+        # vuln per mese
+        path_chart_mese = os.path.join(self.graph_dir, 'horizontal_bar_chart.png')
+        self.vapt_graphs.create_horizontal_bar_chart_months(months, critical, high, medium, low, path_chart_mese)
+        mt.replace_tag_with_chart('{{tag_mensili}}', path_chart_mese)
+
+        # vuln per categoria
+        path_chart_categoria = os.path.join(self.graph_dir, 'bar_chart_by_category.png')
+        self.vapt_graphs.create_radar_chart_by_category(vuln_type_names, vuln_type_sizes, path_chart_categoria)
+        mt.replace_tag_with_chart('{{tag_categoria}}', path_chart_categoria)
+        
+        # vuln per nome
+        path_chart_name = os.path.join(self.graph_dir, 'horizontal_bar_chart_by_name.png')
+        self.vapt_graphs.horizontal_bar_chart_by_name(name_vapt, sizes_vapt, path_chart_name)
+        grafici_salvati = self.vapt_graphs.vuln_charts_by_vulnType(self.mongo_data, self.graph_dir)
+        mt.replace_tags_with_charts_column("{{tag_name}}", grafici_salvati)
+        
         mt.modify_word_document_with_charts(self.mongo_data)
 
     def run_recheck(self):
