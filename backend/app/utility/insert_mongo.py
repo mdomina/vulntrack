@@ -66,7 +66,7 @@ class InsertMongo():
                 "findings.status": 1,
                 "date": 1,
                 "company": 1,
-                "_id": 0
+                "_id": 1
             })
 
             documenti = []
@@ -93,8 +93,6 @@ class InsertMongo():
                     company_id = documento.get("company")
                     documento["company"] =  self.companyFind(company_id)
 
-                    # Genera l'hash MD5 dei valori "name", "auditType", "company", "date"
-                    documento["id"] = self.hash(documento)
                     documenti.append(documento)
 
 
@@ -124,17 +122,18 @@ class InsertMongo():
                     logger.info("Elementi presenti nel vulntrack db ma mancanti in pwndoc (saranno eliminati):")
                     for doc in extra_vulntrack:
                         original_doc = {k: v for k, v in doc}
-                        self.vulntrack_db.collection_vapt.delete_one({'id': original_doc['id']})
-                        logger.info(f"Documento con ID {original_doc['id']} eliminato dal nuovo MongoDB.")
+                        self.vulntrack_db.collection_vapt.delete_one({'_id': original_doc['_id']})
+                        logger.info(f"Documento con ID {str(original_doc['_id'])} eliminato dal nuovo MongoDB.")
 
                 if missing_vulntrack:
                     logger.info("Elementi presenti in pwndoc ma mancanti nel vulntrack db:")
                     for doc in missing_vulntrack:
-                        original_doc = {k: v for k, v in doc}
-                        for documento in lista_pwndoc:
-                            if documento["id"] == original_doc["id"]:
-                                self.vulntrack_db.collection_vapt.insert_one(documento)
-                                logger.info(f"Documento con ID {documento['id']} inserito nel nuovo MongoDB.")
+                        original_doc = {k: v for k, v in doc}  
+                        try:         
+                            self.vulntrack_db.collection_vapt.insert_one(original_doc)
+                            logger.info(f"Documento con ID {str(original_doc['_id'])} inserito nel nuovo MongoDB.")
+                        except Exception as e:
+                            logger.error(f"Errore durante l'inserimento: {e}")
 
         except Exception as e:
             logger.error(f"Errore durante la sincronizzazione: {str(e)}")
@@ -171,13 +170,7 @@ class InsertMongo():
 
             # Iterate through each document and remove the '_id' field
             for documento in lista_vuln:
-                if "_id" in documento:
-                    del documento["_id"]
-                    result.append(documento)
-                # Now, 'documento' will not contain the '_id' field.
-                # You can process each document further as needed.
-                # For example, inserting the modified document into another collection or performing another action.
-                # self.some_other_collection.insert_one(documento)
+                result.append(documento)
             return result
         except Exception as e:
             logger.error(f"Errore durante l'elaborazione dei documenti: {e}")
