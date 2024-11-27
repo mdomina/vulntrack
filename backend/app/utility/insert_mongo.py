@@ -128,12 +128,14 @@ class InsertMongo():
                 if missing_vulntrack:
                     logger.info("Elementi presenti in pwndoc ma mancanti nel vulntrack db:")
                     for doc in missing_vulntrack:
-                        original_doc = {k: v for k, v in doc}  
-                        try:         
-                            self.vulntrack_db.collection_vapt.insert_one(original_doc)
-                            logger.info(f"Documento con ID {str(original_doc['_id'])} inserito nel nuovo MongoDB.")
-                        except Exception as e:
-                            logger.error(f"Errore durante l'inserimento: {e}")
+                        original_doc = {k: v for k, v in doc}
+                        for documento in lista_pwndoc:
+                            try:   
+                                if documento["_id"] == original_doc["_id"]:      
+                                    self.vulntrack_db.collection_vapt.insert_one(documento)
+                                    logger.info(f"Documento con ID {str(original_doc['_id'])} inserito nel nuovo MongoDB.")
+                            except Exception as e:
+                                logger.error(f"Errore durante l'inserimento: {e}")
 
         except Exception as e:
             logger.error(f"Errore durante la sincronizzazione: {str(e)}")
