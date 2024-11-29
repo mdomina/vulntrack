@@ -6,6 +6,8 @@ import store from './store/index.js'
 import './plugins/base'
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css'; //importa i css
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 
 // AXIOS
 import axios from 'axios';

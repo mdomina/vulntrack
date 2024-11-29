@@ -135,11 +135,11 @@ import Basse from './components/Basse.vue'
 import Medie from './components/Medie.vue'
 import Alte from './components/Alte.vue'
 import Critiche from './components/Critiche.vue'
-import TableRemediation from './components/TableRemediation.vue'
 import BarChart from './components/BarChart.vue'
 import TreemapChart from './components/TreemapChart.vue'
 import { mapActions } from 'vuex';
 import axios from 'axios';
+import NProgress from 'nprogress';
 
 export default {
     name: "Dashboard",
@@ -177,11 +177,21 @@ export default {
             this.auditFiltered.type = newData[0].auditType
             
         },
-        getDataRemediation() {
-            const urlBackend = process.env.VUE_APP_VAPT_DATA_DASHBOARD;
-            axios.get(urlBackend).then(res => {
-                this.dataRemediation = res.data
-            })
+        async getDataRemediation() {
+            try {
+                // Inizia la barra
+                NProgress.start();
+
+                // Recupera i dati
+                const urlBackend = process.env.VUE_APP_VAPT_DATA_DASHBOARD;
+                const response = await axios.get(urlBackend);
+                this.dataRemediation = response.data;
+            } catch (error) {
+                this.$toast.error('Errore caricamento dati', { duration: 3000, theme: "bubble" });
+            } finally {
+                // Completa la barra, indipendentemente dall'esito
+                NProgress.done();
+            }
         },
         clearFilter(){
             this.auditFiltered.name = "";
@@ -220,7 +230,7 @@ export default {
                     window.URL.revokeObjectURL(url);
                 })
                 .catch((error) => {
-                    console.error("Errore nel download del report:", error);
+                    this.$toast.error('Errore caricamento dati', { duration: 3000, theme: "bubble" });
                 })
                 .finally(() => {
                     clearInterval(interval);

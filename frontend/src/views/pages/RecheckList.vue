@@ -39,6 +39,8 @@
 import axios from 'axios';
 import { mapActions } from 'vuex';
 import router from '../../router';
+import NProgress from 'nprogress';
+
 export default {
     data() {
         return {
@@ -56,11 +58,21 @@ export default {
         }
     },
     methods: {
-        getListaRemediation(){
-            axios.get("/recheck/list").then(res => {
-                
-                this.remediations = res.data
-            })
+        getListaRemediation() {
+            NProgress.start(); // Avvia la barra di caricamento
+
+            axios
+                .get("/recheck/list")
+                .then((res) => {
+                this.remediations = res.data; // Imposta i dati ricevuti
+                })
+                .catch((error) => {
+                console.error("Errore nel recupero dei dati:", error);
+                this.$toast.error('Errore caricamento dati', { duration: 3000, theme: "bubble" }); // Mostra il messaggio di errore
+                })
+                .finally(() => {
+                NProgress.done(); // Termina la barra di caricamento
+                });
         },
         ...mapActions(
              ['checkAuth']

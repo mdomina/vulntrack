@@ -28,6 +28,31 @@ const mutations = {
 };
 
 const actions = {
+    async login(ctx, credentials) {
+        const urlBackend = process.env.VUE_APP_AUTH_TOKEN;
+        try {
+            // Effettua il login e ottieni il token
+            const response = await axios.post(urlBackend, credentials);
+            const token = response.data.access_token;
+
+            // Salva il token nel localStorage e aggiorna lo stato auth
+            localStorage.setItem('token', token);
+            ctx.commit('setAuth', true);
+
+            // Recupera le informazioni dell'utente
+            const userResponse = await axios.get('/users/me');
+            ctx.commit('setLevel', userResponse.data.role);
+            ctx.commit('setUsername', userResponse.data.username);
+            ctx.commit('setEmail', userResponse.data.email);
+            ctx.commit('setUser', userResponse.data);
+
+            // Effettua il redirect alla dashboard
+            router.push('/dashboard/dashboard');
+        } catch (error) {
+            console.error("Errore durante il login:", error);
+            throw error; // Rilancia l'errore per permettere al componente di gestirlo
+        }
+    },
     userInfo: (ctx) => {
         axios.get('/users/me')
             .then((res) => {
