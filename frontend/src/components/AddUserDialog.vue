@@ -114,42 +114,41 @@ export default {
 
     // Funzione per inviare i dati dell'utente tramite API
     submit() {
-      // Controlla se il modulo è valido
       if (this.$refs.form.validate()) {
-        const urlApiUserAdd = process.env.VUE_APP_ADMIN_USERS_ADD; // Variabile da .env per URL API
-        axios.post(urlApiUserAdd, {
+        const urlApiUserAdd = process.env.VUE_APP_ADMIN_USERS_ADD;
+        const newUser = {
           email: this.user.email,
           name: this.user.name,
           surname: this.user.surname,
           password: this.user.password,
           role: this.user.role,
-          companies: Array.isArray(this.user.ente) ? this.user.ente : [this.user.ente] // Assicurati che sia un array di stringhe
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            this.$emit('add-user', this.user); // Passa i dati dell'utente al componente genitore
-            this.close(); // Chiudi il dialog
-            this.resetForm(); // Resetta il modulo
-            this.$toast.success("Utente aggiunto con successo!"); // Notifica di successo
-          } else {
-            throw new Error(`Errore nel server: ${response.statusText}`);
-          }
-        })
-        .catch((error) => {
-          // Gestione degli errori basata sul codice di stato
-          if (error.response && error.response.status === 403) {
-            this.$toast.error("Non hai i permessi per aggiungere utenti!");
-          } else if (error.response && error.response.status === 400) {
-            this.$toast.error("Email già in uso. Scegli un'altra email.");
-          } else {
-            this.$toast.error("Errore interno del server. Riprova più tardi.");
-          }
-        });
+          companies: Array.isArray(this.user.ente) ? this.user.ente : [this.user.ente]
+        };
+        
+        axios.post(urlApiUserAdd, newUser)
+          .then((response) => {
+            if (response.status === 200) {
+              this.$emit('add-user', response.data); // Passa l'utente appena creato
+              this.close();
+              this.resetForm();
+              this.$toast.success("Utente aggiunto con successo!");
+            } else {
+              throw new Error(`Errore nel server: ${response.statusText}`);
+            }
+          })
+          .catch((error) => {
+            if (error.response && error.response.status === 403) {
+              this.$toast.error("Non hai i permessi per aggiungere utenti!");
+            } else if (error.response && error.response.status === 400) {
+              this.$toast.error("Email già in uso. Scegli un'altra email.");
+            } else {
+              this.$toast.error("Errore interno del server. Riprova più tardi.");
+            }
+          });
       } else {
-        this.$toast.error("Per favore, completa il modulo correttamente."); // Messaggio di errore per validazione fallita
+        this.$toast.error("Per favore, completa il modulo correttamente.");
       }
-    },
-    
+    },    
     // Funzione per alternare la visibilità della password
     toggleShowPassword() {
       this.showPassword = !this.showPassword; // Alterna la visibilità della password

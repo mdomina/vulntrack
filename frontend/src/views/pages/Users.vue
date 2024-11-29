@@ -28,6 +28,7 @@ import axios from 'axios';
 import AddUserDialog from '@/components/AddUserDialog.vue';
 import UserTable from '@/components/UserTable.vue';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog.vue';
+import NProgress from 'nprogress';
 
 export default {
   components: {
@@ -45,36 +46,48 @@ export default {
   },
   methods: {
     getUsersList() {
+      NProgress.start(); // Avvia la barra di caricamento
+
       const urlApiUserList = process.env.VUE_APP_ADMIN_USERS_LIST;
       axios.get(urlApiUserList)
         .then((response) => {
           this.users = response.data || [];
         })
         .catch(() => {
-          this.$toast.error('Errore nel recupero degli utenti');
+          this.$toast.error('Errore nel recupero degli utenti', { duration: 3000, theme: "bubble" });
+        })
+        .finally(() => {
+          NProgress.done(); // Termina la barra di caricamento
         });
     },
+
     deleteUser(userEmail) {
+      NProgress.start(); // Avvia la barra di caricamento
+
       const urlApiUserDelete = process.env.VUE_APP_ADMIN_USERS_DELETE;
       axios.delete(urlApiUserDelete, {
         data: { email: userEmail }
       })
         .then(() => {
-          this.$toast.success("Utente eliminato con successo");
+          this.$toast.success("Utente eliminato con successo", { duration: 3000, theme: "bubble" });
           this.users = this.users.filter(user => user.email !== userEmail);
         })
         .catch(() => {
-          this.$toast.error("Errore durante l'eliminazione dell'utente");
+          this.$toast.error("Errore durante l'eliminazione dell'utente", { duration: 3000, theme: "bubble" });
+        })
+        .finally(() => {
+          NProgress.done(); // Termina la barra di caricamento
         });
     },
+
     openDeleteDialog(userEmail) {
       this.currentUserToDelete = userEmail;
       this.dialogDelete = true;
     },
-    addUser(user) {
-      this.users.push(user);
-      this.getUsersList();
+    addUser() {
+      this.getUsersList(); // Aggiorna la lista degli utenti
     }
+
   },
   mounted() {
     this.getUsersList();

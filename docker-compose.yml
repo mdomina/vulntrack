@@ -3,7 +3,7 @@ version: '3.8'
 services:
   vulntrack_backend:
     build: ./backend/
-    image: vulntrack/backend:1.0
+    image: vulntrack/backend:1.2
     container_name: vulntrack_backend
     restart: always
     environment:
@@ -17,7 +17,7 @@ services:
       context: ./frontend/
       args:
         VUE_APP_BACKEND_URL: "https://backend-ip/api"
-    image: vulntrack/frontend:1.0
+    image: vulntrack/frontend:1.2
     container_name: vulntrack_frontend
     restart: always
   

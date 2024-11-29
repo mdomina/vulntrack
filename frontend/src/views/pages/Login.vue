@@ -39,23 +39,20 @@ export default {
         rules2: [value => !!value || 'Required.'],
     }),
     methods: {
-        login() {
-            const urlBackend = process.env.VUE_APP_AUTH_TOKEN;
-            axios.post(urlBackend, this.dataUser).then((response) => {
-                localStorage.setItem('token', response.data.access_token);
-                this.$store.dispatch('actSetAuth');
-                this.$store.dispatch('userInfo').then(() => {
-                    this.$router.push('/');
-                    this.$toast.success('Login effettuato con successo', { duration: 3000, theme: "bubble" });
-                });
-            }).catch((error) => {
+        async login() {
+            try {
+                // Chiamata all'azione Vuex login
+                await this.$store.dispatch('login', this.dataUser);
+                this.$toast.success('Login effettuato con successo', { duration: 3000, theme: "bubble" });
+            } catch (error) {
+                // Gestione degli errori
                 if (error.response && error.response.status === 401) {
                     this.$toast.error('Username o Password Sbagliate', { duration: 3000, theme: "bubble" });
                 } else {
                     this.$toast.error('Errore durante il login. Riprova più tardi.', { duration: 3000, theme: "bubble" });
                 }
-                console.error("Errore durante il login:", error); // Log per il debug
-            });
+                console.error("Errore durante il login:", error);
+            }
         }
     }
 };
